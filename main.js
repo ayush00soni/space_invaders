@@ -1,4 +1,5 @@
 import { Player } from "./modules/player.js";
+import { Enemy } from "./modules/enemy.js";
 
 function game() {
     /** @type {HTMLCanvasElement} */
@@ -7,7 +8,20 @@ function game() {
     /** @type {CanvasRenderingContext2D} */
     const gctx = gamecanvas.getContext("2d");
 
+    // Main Player
     const player1 = new Player(0.5, 0.9, 400, 300, 50, 50, "white");
+
+    // Bullets Array
+    const bullets = [];
+
+    // Enemies Array
+    const enemies = [];
+    const enemyCount = 10, enemyWidth = 50, enemyHeight = 50;
+    const enemyRelSpacing = 0.05;
+    for (let i = 0; i < enemyCount; i++) {
+        enemies.push(new Enemy(0.03 + i * enemyRelSpacing, 0.1, 50, enemyWidth, enemyHeight, "red"));
+    }
+
 
     function resizeCanvas() {
         gamecanvas.height = window.innerHeight;
@@ -65,7 +79,6 @@ function game() {
         // TODO: move player, check input etc...
         player1.update(deltatime, input, gctx);
         if (input["Space"]) {
-            console.log("fire");
             const bullet = player1.shoot();
             if (bullet) {
                 bullets.push(bullet);
@@ -76,8 +89,10 @@ function game() {
             bullet.update(deltatime, gctx);
             if (bullet.isOffScreen()) {
                 bullets.splice(index, 1);
-                console.log("Deleted")
             }
+        });
+        enemies.forEach((enemy) => {
+            enemy.update(deltatime, gctx);
         });
     }
 
@@ -88,10 +103,12 @@ function game() {
             bullet.draw(gctx);
         });
         player1.draw(gctx);
+        enemies.forEach((enemy) => {
+            enemy.draw(gctx);
+        });
     }
 
-    // Bullets Array
-    const bullets = [];
+
 
 }
 
