@@ -31,8 +31,6 @@ function game() {
     }
     requestAnimationFrame(gameloop);
 
-    console.log(player1);
-
     const input = {};
 
     window.addEventListener("keydown", (e) => {
@@ -66,17 +64,34 @@ function game() {
     function update(deltatime) {
         // TODO: move player, check input etc...
         player1.update(deltatime, input, gctx);
+        if (input["Space"]) {
+            console.log("fire");
+            const bullet = player1.shoot();
+            if (bullet) {
+                bullets.push(bullet);
+            }
+            input["Space"] = false;
+        }
+        bullets.forEach((bullet, index) => {
+            bullet.update(deltatime, gctx);
+            if (bullet.isOffScreen()) {
+                bullets.splice(index, 1);
+                console.log("Deleted")
+            }
+        });
     }
 
     function draw() {
         // TODO: draw players, enemies, bullets etc...
         gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
+        bullets.forEach((bullet) => {
+            bullet.draw(gctx);
+        });
         player1.draw(gctx);
     }
 
     // Bullets Array
     const bullets = [];
-    
 
 }
 

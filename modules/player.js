@@ -22,6 +22,7 @@ export class Player {
         this.width = width;
         this.height = height;
         this.color = color;
+        this.shootCooldown = 0;
     }
     /**
     * @param {CanvasRenderingContext2D} gctx
@@ -97,11 +98,12 @@ export class Player {
             this.vy *= scale;
         }
 
-        console.log(speed);
     }
 
     shoot() {
-        const bullet = new Bullet(this.relX, this.relY, 0.5, 5, "yellow");
+        if (this.shootCooldown > 0) return null;
+        this.shootCooldown = 0.5;
+        const bullet = new Bullet(this.relX, this.relY, 200, 5, 20, "yellow");
         return bullet;
     }
 
@@ -111,8 +113,7 @@ export class Player {
      * @param {CanvasRenderingContext2D} gctx
      */
     update(deltatime, input, gctx) {
-        // TODO: implement player-specific update logic (e.g. movement, shooting)
-
+        this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
         // Handle input for acceleration
         this.accelerate(deltatime, input);
 
