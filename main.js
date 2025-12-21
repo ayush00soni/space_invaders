@@ -30,11 +30,8 @@ function game() {
     let dir = 1;
     // Minimum distance from edge is made to be same as space between two enemies
     for (let i = 0; i < enemyCount; i++) {
-        enemies.push(new Enemy(i, (i + 1) * enemyRelSpacing + (i + 0.5) * enemyWidth / gctx.canvas.width, 0.1, 100, enemyWidth, enemyHeight, "red", enemyRelSpacing, dir));
+        enemies.push(new Enemy(i, (i + 1) * enemyRelSpacing + (i + 0.5) * enemyWidth / gctx.canvas.width, 0.1, 100, enemyWidth, enemyHeight, "red", enemyRelSpacing, dir, 0));
     }
-
-
-
 
     let lasttime = performance.now();
 
@@ -100,6 +97,9 @@ function game() {
             if(enemy.isOnEdge(gctx) && index < enemyCount-1) {
                 enemies[(index+1)].switchDir();
             }
+            if (index > 0) {
+                enemy.adjustSpacing(enemies[index -1], gctx);
+            }
         });
     }
 
@@ -114,8 +114,6 @@ function game() {
             enemy.draw(gctx);
         });
     }
-
-
 
 }
 

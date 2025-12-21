@@ -1,5 +1,5 @@
 export class Enemy {
-    constructor(id, relX, relY, speed, width, height, color, spacing, dir) {
+    constructor(id, relX, relY, speed, width, height, color, spacing, dir, column) {
         this.id = id;
         this.relX = relX;
         this.relY = relY;
@@ -10,6 +10,7 @@ export class Enemy {
         this.color = color;
         this.spacing = spacing;
         this.dir = dir;
+        this.column = column;
         this.dirSwitch = false;
     }
 
@@ -19,6 +20,7 @@ export class Enemy {
             this.dirSwitch = false;
         } else {
             this.relY += this.height / gctx.canvas.height + this.spacing * gctx.canvas.width / gctx.canvas.height;
+            this.column++;
             this.switchDir();
         }
 
@@ -46,5 +48,17 @@ export class Enemy {
         this.y = gctx.canvas.height * this.relY - mS / 2;
         gctx.fillStyle = "blue";
         gctx.fillRect(this.x, this.y, mS, mS);
+    }
+
+    /**
+     * @param {Enemy} prevEnemy
+     * @param {Enemy} nextEnemy
+     */
+    adjustSpacing(prevEnemy, gctx) {
+        if (prevEnemy) {
+            if (this.column === prevEnemy.column && this.relX - prevEnemy.relX !== this.dir * (this.width / gctx.canvas.width + this.spacing)) {
+                this.relX = prevEnemy.relX + this.dir * (this.width / gctx.canvas.width + this.spacing);
+            }
+        }
     }
 }
