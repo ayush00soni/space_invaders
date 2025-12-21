@@ -25,6 +25,12 @@ export class Bullet {
         this.y = gctx.canvas.height * this.relY - this.height / 2;
         gctx.fillStyle = this.color;
         gctx.fillRect(this.x, this.y, this.width, this.height);
+
+        const mS = this.width / 2;
+        this.x = gctx.canvas.width * this.relX - mS / 2;
+        this.y = gctx.canvas.height * this.relY - mS / 2;
+        gctx.fillStyle = "blue";
+        gctx.fillRect(this.x, this.y, mS, mS);
     }
 
     isOffScreen() {

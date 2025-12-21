@@ -8,8 +8,17 @@ function game() {
     /** @type {CanvasRenderingContext2D} */
     const gctx = gamecanvas.getContext("2d");
 
+    function resizeCanvas() {
+        gamecanvas.height = window.innerHeight;
+        gamecanvas.width = window.innerWidth;
+    }
+
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
     // Main Player
-    const player1 = new Player(0.5, 0.9, 400, 300, 50, 50, "white");
+    const player1 = new Player(0.5, 0.9, 400, 300, 50, 50, "green");
 
     // Bullets Array
     const bullets = [];
@@ -17,19 +26,15 @@ function game() {
     // Enemies Array
     const enemies = [];
     const enemyCount = 10, enemyWidth = 50, enemyHeight = 50;
-    const enemyRelSpacing = 0.05;
+    const enemyRelSpacing = 0.01;
+    let dir = 1;
+    // Minimum distance from edge is made to be same as space between two enemies
     for (let i = 0; i < enemyCount; i++) {
-        enemies.push(new Enemy(0.03 + i * enemyRelSpacing, 0.1, 50, enemyWidth, enemyHeight, "red"));
+        enemies.push(new Enemy(i, (i + 1) * enemyRelSpacing + (i + 0.5) * enemyWidth / gctx.canvas.width, 0.1, 100, enemyWidth, enemyHeight, "red", enemyRelSpacing, dir));
     }
 
 
-    function resizeCanvas() {
-        gamecanvas.height = window.innerHeight;
-        gamecanvas.width = window.innerWidth;
-    }
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
 
     let lasttime = performance.now();
 
@@ -83,7 +88,6 @@ function game() {
             if (bullet) {
                 bullets.push(bullet);
             }
-            input["Space"] = false;
         }
         bullets.forEach((bullet, index) => {
             bullet.update(deltatime, gctx);
@@ -91,8 +95,11 @@ function game() {
                 bullets.splice(index, 1);
             }
         });
-        enemies.forEach((enemy) => {
+        enemies.forEach((enemy, index) => {
             enemy.update(deltatime, gctx);
+            if(enemy.isOnEdge(gctx) && index < enemyCount-1) {
+                enemies[(index+1)].switchDir();
+            }
         });
     }
 

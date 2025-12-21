@@ -33,10 +33,16 @@ export class Player {
         gctx.fillStyle = this.color;
         gctx.fillRect(this.x, this.y, this.width, this.height);
 
+
         // Draw midpoint marker (for bullet origin)
         const mS = 4;
         gctx.fillStyle = "red";
         gctx.fillRect(this.x + this.width / 2 - mS / 2, this.y, mS, mS);
+
+        this.x = gctx.canvas.width * this.relX - mS / 2;
+        this.y = gctx.canvas.height * this.relY - mS / 2;
+        gctx.fillStyle = "blue";
+        gctx.fillRect(this.x, this.y, mS, mS);
     }
     /**
     * @param {number} deltatime
@@ -103,7 +109,7 @@ export class Player {
     shoot() {
         if (this.shootCooldown > 0) return null;
         this.shootCooldown = 0.5;
-        const bullet = new Bullet(this.relX, this.relY, this.maxSpeed + Math.max(-this.vy, 0), 5, 20, "yellow");
+        const bullet = new Bullet(this.relX, this.relY, this.maxSpeed * 2, 5, 20, "yellow");
         return bullet;
     }
 
