@@ -7,6 +7,9 @@ export class Bullet {
         this.height = height;
         this.color = color;
         this.active = true;
+        this.x = 0;
+        this.y = 0;
+        this.active = true;
     }
 
     /**

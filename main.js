@@ -1,5 +1,6 @@
 import { Player } from "./modules/player.js";
 import { Enemy } from "./modules/enemy.js";
+import { collisionDetected } from "./modules/collision.js";
 
 function game() {
     /** @type {HTMLCanvasElement} */
@@ -9,8 +10,8 @@ function game() {
     const gctx = gamecanvas.getContext("2d");
 
     function resizeCanvas() {
-        gamecanvas.height = window.innerHeight;
-        gamecanvas.width = window.innerWidth;
+        gamecanvas.height = Math.min(window.innerHeight, window.innerWidth);
+        gamecanvas.width = gamecanvas.height;
     }
 
 
@@ -25,8 +26,8 @@ function game() {
 
     // Enemies Array
     const enemies = [];
-    const enemyCount = 10, enemyWidth = 50, enemyHeight = 50;
-    const enemyRelSpacing = 0.01;
+    const enemyCount = 4, enemyWidth = 50, enemyHeight = 50;
+    const enemyRelSpacing = 0.03;
     let dir = 1;
     // Minimum distance from edge is made to be same as space between two enemies
     for (let i = 0; i < enemyCount; i++) {
@@ -94,13 +95,32 @@ function game() {
         });
         enemies.forEach((enemy, index) => {
             enemy.update(deltatime, gctx);
-            if(enemy.isOnEdge(gctx) && index < enemyCount-1) {
-                enemies[(index+1)].switchDir();
-            }
-            if (index > 0) {
-                enemy.adjustSpacing(enemies[index -1], gctx);
-            }
         });
+
+        // Check for collisions
+        for (const enemy of enemies) {
+            for (const bullet of bullets) {
+                if (collisionDetected(bullet, enemy)) {
+                    bullet.active = false;
+                    enemy.active = false;
+                    break;
+                }
+            }
+        }
+
+        // Remove inactive bullets
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            if (!bullets[i].active) {
+                bullets.splice(i, 1);
+            }
+        }
+
+        // Remove inactive enemies
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            if (!enemies[i].active) {
+                enemies.splice(i, 1);
+            }
+        }
     }
 
     function draw() {

@@ -12,6 +12,9 @@ export class Enemy {
         this.dir = dir;
         this.column = column;
         this.dirSwitch = false;
+        this.x = 0;
+        this.y = 0;
+        this.active = true;
     }
 
     update(deltatime, gctx) {
@@ -50,15 +53,4 @@ export class Enemy {
         gctx.fillRect(this.x, this.y, mS, mS);
     }
 
-    /**
-     * @param {Enemy} prevEnemy
-     * @param {Enemy} nextEnemy
-     */
-    adjustSpacing(prevEnemy, gctx) {
-        if (prevEnemy) {
-            if (this.column === prevEnemy.column && this.relX - prevEnemy.relX !== this.dir * (this.width / gctx.canvas.width + this.spacing)) {
-                this.relX = prevEnemy.relX + this.dir * (this.width / gctx.canvas.width + this.spacing);
-            }
-        }
-    }
 }
