@@ -12,21 +12,19 @@ export class Enemy {
         this.dir = dir;
         this.column = column;
         this.dirSwitch = false;
-        this.x = 0;
-        this.y = 0;
         this.active = true;
     }
 
     update(deltatime, gctx) {
-        if (!this.isOnEdge(gctx) || this.dirSwitch) {
-            this.relX = this.relX + this.dir * this.speed * deltatime / gctx.canvas.width;
-            this.dirSwitch = false;
-        } else {
+        if (this.isOnEdge(deltatime, gctx) && !this.dirSwitch) {
+            console.log("edge hit by enemy id:", this.id);
             this.relY += this.height / gctx.canvas.height + this.spacing * gctx.canvas.width / gctx.canvas.height;
             this.column++;
             this.switchDir();
         }
 
+        this.relX = this.relX + this.dir * this.speed * deltatime / gctx.canvas.width;
+        this.dirSwitch = false;
     }
 
     switchDir() {
@@ -34,10 +32,10 @@ export class Enemy {
         this.dirSwitch = true;
     }
 
-    isOnEdge(gctx) {
+    isOnEdge(deltatime, gctx) {
         // Minimum distance from edge is made to be same as space between two enemies
         const edgeSpace = this.spacing + this.width / gctx.canvas.width / 2;
-        return (this.relX < edgeSpace || this.relX > 1 - edgeSpace);
+        return (this.relX + this.dir * this.speed * deltatime / gctx.canvas.width < edgeSpace || this.relX + this.dir * this.speed * deltatime / gctx.canvas.width > 1 - edgeSpace);
     }
 
     draw(gctx) {

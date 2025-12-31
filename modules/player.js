@@ -13,8 +13,6 @@ export class Player {
     constructor(relX, relY, maxSpeed, acceleration, width, height, color) {
         this.relX = relX;
         this.relY = relY;
-        this.x = 0;
-        this.y = 0;
         this.maxSpeed = maxSpeed;
         this.acceleration = acceleration;
         this.vx = 0;
