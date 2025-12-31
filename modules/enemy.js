@@ -16,7 +16,6 @@ export class Enemy {
 
     update(deltatime, gctx) {
         this.relX = this.relX + (this.dir * this.speed * deltatime / gctx.canvas.width);
-        console.log(this.relX, this.isOnEdge(deltatime, gctx));
     }
 
     shiftDown(gctx) {

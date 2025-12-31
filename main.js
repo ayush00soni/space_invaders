@@ -45,7 +45,6 @@ function game() {
      * @param {number} timestamp
      */
     function gameloop(timestamp) {
-        // console.log("Animation running");
         const deltatime = (timestamp - lasttime) / 1000;
         lasttime = timestamp;
         update(deltatime);
