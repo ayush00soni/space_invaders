@@ -22,7 +22,9 @@ function game() {
     let score = 0; // Player score
 
     // Main Player
-    const player1 = new Player(0.5, 0.9, 400, 300, 50, 50, "green");
+    const playerRelX = 0.5;
+    const playerRelY = 0.9;
+    const player1 = new Player(playerRelX, playerRelY, 400, 300, 50, 50, "green");
 
     // Bullets Array
     const bullets = [];
@@ -90,15 +92,39 @@ function game() {
         // Skip updates if game over
         if (gameOver) return;
 
-        player1.update(deltatime, input, gctx);
+        if (player1.respawnTimer > 0) {
+            player1.respawnTimer -= deltatime;
+        } else {
+            player1.update(deltatime, input, gctx);
 
-        // Handle shooting
-        if (input["Space"]) {
-            const bullet = player1.shoot();
-            if (bullet) {
-                bullets.push(bullet);
+            // Handle shooting
+            if (input["Space"]) {
+                const bullet = player1.shoot();
+                if (bullet) {
+                    bullets.push(bullet);
+                }
+            }
+
+            // Check for player-enemy collisions
+            if (player1.isAlive) {
+                for (const enemy of enemies) {
+                    // Ignore inactive enemies
+                    if (!enemy.active) continue;
+                    if (collisionDetected(player1, enemy, gctx)) {
+                        lives--;
+                        player1.hit();
+                        console.log("Player hit by enemy");
+                        break;
+                    }
+                }
             }
         }
+        if (player1.respawnTimer <= 0 && !player1.isAlive) {
+            player1.respawn(playerRelX, playerRelY);
+            console.log("Player respawned");
+        }
+
+
 
         bullets.forEach((bullet, index) => {
             bullet.update(deltatime, gctx);
@@ -149,19 +175,6 @@ function game() {
             }
         }
 
-        // Check for player-enemy collisions
-        if (player1.isAlive) {
-            for (const enemy of enemies) {
-                // Ignore inactive enemies
-                if (!enemy.active) continue;
-                if (collisionDetected(player1, enemy, gctx)) {
-                    lives--;
-                    player1.hit();
-                    console.log("Player hit by enemy");
-                    break;
-                }
-            }
-        }
 
         // Enemy reaches bottom (game over)
         for (const enemy of enemies) {
@@ -189,7 +202,8 @@ function game() {
         });
 
         // Draw player
-        player1.draw(gctx);
+        if (player1.isAlive)
+            player1.draw(gctx);
         // Draw enemies
         enemies.forEach((enemy) => {
             enemy.draw(gctx);

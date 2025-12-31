@@ -22,7 +22,8 @@ export class Player {
         this.color = color;
         this.shootCooldown = 0;
         this.isAlive = true;
-        this.respawnDelay = 2; // seconds
+        this.respawnDelay = 2;
+        this.respawnTimer = 0;
     }
     /**
     * @param {CanvasRenderingContext2D} gctx
@@ -146,6 +147,7 @@ export class Player {
         this.isAlive = false;
         this.vx = 0;
         this.vy = 0;
+        this.respawnTimer = this.respawnDelay;
     }
 
     respawn(relX, relY) {
@@ -154,6 +156,7 @@ export class Player {
         this.vx = 0;
         this.vy = 0;
         this.isAlive = true;
+        this.respawnTimer = 0;
     }
 
 }
