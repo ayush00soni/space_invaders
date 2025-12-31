@@ -114,7 +114,7 @@ function game() {
         // Check for bullet-enemy collisions
         for (const enemy of enemies) {
             for (const bullet of bullets) {
-                if (collisionDetected(bullet, enemy)) {
+                if (collisionDetected(bullet, enemy, gctx)) {
                     bullet.active = false;
                     enemy.active = false;
                     score += 10;
@@ -138,13 +138,16 @@ function game() {
         }
 
         // Check for player-enemy collisions
-        for (const enemy of enemies) {
-            // Ignore inactive enemies
-            if (!enemy.active) continue;
-            if (collisionDetected(player1, enemy)) {
-                lives--;
-                console.log("Player hit by enemy");
-                break;
+        if (player1.isAlive) {
+            for (const enemy of enemies) {
+                // Ignore inactive enemies
+                if (!enemy.active) continue;
+                if (collisionDetected(player1, enemy, gctx)) {
+                    lives--;
+                    player1.hit();
+                    console.log("Player hit by enemy");
+                    break;
+                }
             }
         }
 

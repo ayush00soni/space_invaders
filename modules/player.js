@@ -21,6 +21,8 @@ export class Player {
         this.height = height;
         this.color = color;
         this.shootCooldown = 0;
+        this.isAlive = true;
+        this.respawnDelay = 2; // seconds
     }
     /**
     * @param {CanvasRenderingContext2D} gctx
@@ -42,6 +44,16 @@ export class Player {
         gctx.fillStyle = "blue";
         gctx.fillRect(this.x, this.y, mS, mS);
     }
+
+    getBounds(gctx) {
+        return {
+            x: gctx.canvas.width * this.relX - this.width / 2,
+            y: gctx.canvas.height * this.relY - this.height / 2,
+            width: this.width,
+            height: this.height
+        };
+    }
+
     /**
     * @param {number} deltatime
     * @param {CanvasRenderingContext2D} gctx
@@ -116,13 +128,32 @@ export class Player {
      * @param {object} input
      * @param {CanvasRenderingContext2D} gctx
      */
-    update(deltatime, input, gctx) {
-        this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
-        // Handle input for acceleration
-        this.accelerate(deltatime, input);
+    update(deltatime, input, gctx) { // Player is alive
+        if (this.isAlive) {
+            this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
+            // Handle input for acceleration
+            this.accelerate(deltatime, input);
 
-        // Handle input for movement
-        this.move(deltatime, gctx);
+            // Handle input for movement
+            this.move(deltatime, gctx);
+        } else { // Player is dead
+            // Respawn logic
+
+        }
+    }
+
+    hit() {
+        this.isAlive = false;
+        this.vx = 0;
+        this.vy = 0;
+    }
+
+    respawn(relX, relY) {
+        this.relX = relX;
+        this.relY = relY;
+        this.vx = 0;
+        this.vy = 0;
+        this.isAlive = true;
     }
 
 }

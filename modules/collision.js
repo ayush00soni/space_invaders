@@ -1,6 +1,6 @@
-export function collisionDetected(objA, objB) {
-    return (objA.x < objB.x + objB.width &&     // A.left < B.right
-        objA.x + objA.width > objB.x &&         // A.right > B.left
-        objA.y < objB.y + objB.height &&        // A.top < B.bottom
-        objA.y + objA.height > objB.y);         // A.bottom > B.top
+export function collisionDetected(objA, objB, gctx) {
+    return (objA.getBounds(gctx).x < objB.getBounds(gctx).x + objB.getBounds(gctx).width &&     // A.left < B.right
+        objA.getBounds(gctx).x + objA.getBounds(gctx).width > objB.getBounds(gctx).x &&         // A.right > B.left
+        objA.getBounds(gctx).y < objB.getBounds(gctx).y + objB.getBounds(gctx).height &&        // A.top < B.bottom
+        objA.getBounds(gctx).y + objA.getBounds(gctx).height > objB.getBounds(gctx).y);         // A.bottom > B.top
 }
