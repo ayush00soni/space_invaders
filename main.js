@@ -107,9 +107,21 @@ function game() {
             }
         });
 
+        let hitEdge = false;
         enemies.forEach((enemy) => {
             enemy.update(deltatime, gctx);
         });
+        enemies.forEach((enemy) => {
+            if (enemy.isOnEdge(deltatime, gctx)) {
+                hitEdge = true;
+            }
+        });
+        if (hitEdge) {
+            enemies.forEach((enemy) => {
+                enemy.shiftDown(gctx);
+            });
+        }
+
 
         // Check for bullet-enemy collisions
         for (const enemy of enemies) {

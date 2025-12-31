@@ -11,25 +11,17 @@ export class Enemy {
         this.spacing = spacing;
         this.dir = dir;
         this.column = column;
-        this.dirSwitch = false;
         this.active = true;
     }
 
     update(deltatime, gctx) {
-        if (this.isOnEdge(deltatime, gctx) && !this.dirSwitch) {
-            console.log("edge hit by enemy id:", this.id);
-            this.relY += this.height / gctx.canvas.height + this.spacing * gctx.canvas.width / gctx.canvas.height;
-            this.column++;
-            this.switchDir();
-        }
-
-        this.relX = this.relX + this.dir * this.speed * deltatime / gctx.canvas.width;
-        this.dirSwitch = false;
+        this.relX = this.relX + (this.dir * this.speed * deltatime / gctx.canvas.width);
+        console.log(this.relX, this.isOnEdge(deltatime, gctx));
     }
 
-    switchDir() {
-        this.dir = -this.dir;
-        this.dirSwitch = true;
+    shiftDown(gctx) {
+        this.relY += this.height / gctx.canvas.height + this.spacing;
+        this.dir *= -1;
     }
 
     isOnEdge(deltatime, gctx) {
