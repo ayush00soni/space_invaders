@@ -36,16 +36,33 @@ function game() {
     let dir = 1;
     for (let i = 0; i < enemyCount; i++) {
         // Minimum distance from edge is made to be same as space between two enemies
-        enemies.push(new Enemy(i, (i + 1) * enemyRelSpacing + (i + 0.5) * enemyRelWidth, 0.1, 100, enemyRelWidth, enemyRelHeight, "red", enemyRelSpacing, dir, 0));
+        enemies.push(new Enemy(
+            i,
+            (i + 1) * enemyRelSpacing + (i + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
+            0.1, 100,
+            enemyRelWidth,
+            enemyRelHeight,
+            "red",
+            enemyRelSpacing,
+            dir,
+            0
+        ));
     }
 
-    let lasttime = performance.now(); // For delta time calculation
+    let lasttime = 0; // For delta time calculation
     // Game Loop
     /**
      * @param {number} timestamp
      */
     function gameloop(timestamp) {
-        const deltatime = (timestamp - lasttime) / 1000;
+        // Skip the very first frame
+        if (!lasttime) {
+            lasttime = timestamp;
+            requestAnimationFrame(gameloop);
+            return;
+        }
+
+        const deltatime = Math.min((timestamp - lasttime) / 1000, 0.1); // Cap delta time to avoid big jumps
         lasttime = timestamp;
         update(deltatime);
         draw();
@@ -57,7 +74,9 @@ function game() {
     const input = {};
 
     window.addEventListener("keydown", (e) => {
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+        if (["ArrowUp", "ArrowDown", "ArrowLeft",
+            "ArrowRight", "Space", "KeyW",
+            "KeyA", "KeyS", "KeyD"].includes(e.code)) {
             e.preventDefault();
 
             // Prevent opposite directions being active simultaneously
@@ -118,12 +137,11 @@ function game() {
                 }
             }
         }
+        
         if (player1.respawnTimer <= 0 && !player1.isAlive) {
             player1.respawn(playerRelX, playerRelY);
             console.log("Player respawned");
         }
-
-
 
         bullets.forEach((bullet, index) => {
             bullet.update(deltatime, gctx);
@@ -173,7 +191,6 @@ function game() {
                 enemies.splice(i, 1);
             }
         }
-
 
         // Enemy reaches bottom (game over)
         for (const enemy of enemies) {
@@ -225,7 +242,6 @@ function game() {
             return;
         }
     }
-
 }
 
 window.addEventListener("DOMContentLoaded", game);
