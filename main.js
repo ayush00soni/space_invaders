@@ -31,7 +31,7 @@ function game() {
 
     // Enemies Array
     const enemies = [];
-    const enemyCount = 0, enemyRelWidth = 0.05, enemyRelHeight = 0.05;
+    const enemyCount = 5, enemyRelWidth = 0.05, enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
     let dir = 1;
     for (let i = 0; i < enemyCount; i++) {
