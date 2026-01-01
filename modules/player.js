@@ -10,15 +10,15 @@ export class Player {
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, maxSpeed, acceleration, width, height, color) {
+    constructor(relX, relY, maxSpeed, acceleration, relWidth, relHeight, color) {
         this.relX = relX;
         this.relY = relY;
         this.maxSpeed = maxSpeed;
         this.acceleration = acceleration;
         this.vx = 0;
         this.vy = 0;
-        this.width = width;
-        this.height = height;
+        this.relWidth = relWidth;
+        this.relHeight = relHeight;
         this.color = color;
         this.shootCooldown = 0;
         this.isAlive = true;
@@ -29,29 +29,21 @@ export class Player {
     * @param {CanvasRenderingContext2D} gctx
     */
     draw(gctx) {
+        this.width = gctx.canvas.width * this.relWidth;
+        this.height = gctx.canvas.height * this.relHeight;
         this.x = gctx.canvas.width * this.relX - this.width / 2;
         this.y = gctx.canvas.height * this.relY - this.height / 2;
         gctx.fillStyle = this.color;
         gctx.fillRect(this.x, this.y, this.width, this.height);
 
-
-        // Draw midpoint marker (for bullet origin)
-        const mS = 4;
-        gctx.fillStyle = "red";
-        gctx.fillRect(this.x + this.width / 2 - mS / 2, this.y, mS, mS);
-
-        this.x = gctx.canvas.width * this.relX - mS / 2;
-        this.y = gctx.canvas.height * this.relY - mS / 2;
-        gctx.fillStyle = "blue";
-        gctx.fillRect(this.x, this.y, mS, mS);
     }
 
     getBounds(gctx) {
         return {
-            x: gctx.canvas.width * this.relX - this.width / 2,
-            y: gctx.canvas.height * this.relY - this.height / 2,
-            width: this.width,
-            height: this.height
+            x: gctx.canvas.width * this.relX - this.relWidth * gctx.canvas.width / 2,
+            y: gctx.canvas.height * this.relY - this.relHeight * gctx.canvas.height / 2,
+            width: this.width * gctx.canvas.width,
+            height: this.height * gctx.canvas.height
         };
     }
 
@@ -66,6 +58,10 @@ export class Player {
 
         this.relX += relDispX;
         this.relY += relDispY;
+
+
+        this.width = gctx.canvas.width * this.relWidth;
+        this.height = gctx.canvas.height * this.relHeight;
 
         // Keep player within screen bounds
         this.relX = Math.max(this.width / (2 * gctx.canvas.width),
@@ -120,7 +116,7 @@ export class Player {
     shoot() {
         if (this.shootCooldown > 0) return null;
         this.shootCooldown = 0.5;
-        const bullet = new Bullet(this.relX, this.relY, this.maxSpeed * 2, 5, 20, "yellow");
+        const bullet = new Bullet(this.relX, this.relY, this.maxSpeed * 2, 0.005, 0.02, "yellow");
         return bullet;
     }
 

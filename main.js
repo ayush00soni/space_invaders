@@ -24,19 +24,19 @@ function game() {
     // Main Player
     const playerRelX = 0.5;
     const playerRelY = 0.9;
-    const player1 = new Player(playerRelX, playerRelY, 400, 300, 50, 50, "green");
+    const player1 = new Player(playerRelX, playerRelY, 400, 300, 0.05, 0.05, "green");
 
     // Bullets Array
     const bullets = [];
 
     // Enemies Array
     const enemies = [];
-    const enemyCount = 5, enemyWidth = 50, enemyHeight = 50;
+    const enemyCount = 5, enemyRelWidth = 0.05, enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.03;
     let dir = 1;
     for (let i = 0; i < enemyCount; i++) {
         // Minimum distance from edge is made to be same as space between two enemies
-        enemies.push(new Enemy(i, (i + 1) * enemyRelSpacing + (i + 0.5) * enemyWidth / gctx.canvas.width, 0.1, 100, enemyWidth, enemyHeight, "red", enemyRelSpacing, dir, 0));
+        enemies.push(new Enemy(i, (i + 1) * enemyRelSpacing + (i + 0.5) * enemyRelWidth, 0.1, 100, enemyRelWidth, enemyRelHeight, "red", enemyRelSpacing, dir, 0));
     }
 
     let lasttime = performance.now(); // For delta time calculation
@@ -143,7 +143,7 @@ function game() {
         });
         if (hitEdge) {
             enemies.forEach((enemy) => {
-                enemy.shiftDown(gctx);
+                enemy.shiftDown();
             });
         }
 
@@ -178,7 +178,7 @@ function game() {
         // Enemy reaches bottom (game over)
         for (const enemy of enemies) {
             if (enemy.y + enemy.height >= gctx.canvas.height) {
-                lives--;
+                gameOver = true;
                 console.log("Enemy reached bottom");
                 break;
             }

@@ -1,10 +1,10 @@
 export class Bullet {
-    constructor(relX, relY, speed, width, height, color) {
+    constructor(relX, relY, speed, relWidth, relHeight, color) {
         this.relX = relX;
         this.relY = relY;
         this.speed = speed;
-        this.width = width;
-        this.height = height;
+        this.relWidth = relWidth;
+        this.relHeight = relHeight;
         this.color = color;
         this.active = true;
     }
@@ -23,26 +23,22 @@ export class Bullet {
     draw(gctx) {
         this.x = gctx.canvas.width * this.relX - this.width / 2;
         this.y = gctx.canvas.height * this.relY - this.height / 2;
+        this.width = gctx.canvas.width * this.relWidth;
+        this.height = gctx.canvas.height * this.relHeight;
         gctx.fillStyle = this.color;
         gctx.fillRect(this.x, this.y, this.width, this.height);
-
-        const mS = this.width / 2;
-        this.x = gctx.canvas.width * this.relX - mS / 2;
-        this.y = gctx.canvas.height * this.relY - mS / 2;
-        gctx.fillStyle = "blue";
-        gctx.fillRect(this.x, this.y, mS, mS);
     }
 
     getBounds(gctx) {
         return {
             x: gctx.canvas.width * this.relX - this.width / 2,
             y: gctx.canvas.height * this.relY - this.height / 2,
-            width: this.width,
-            height: this.height
+            width: gctx.canvas.width * this.relWidth,
+            height: gctx.canvas.height * this.relHeight
         };
     }
 
     isOffScreen() {
-        return this.relY < 0;
+        return this.relY + (this.relHeight/2) < 0;
     }
 }
