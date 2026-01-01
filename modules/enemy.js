@@ -1,9 +1,9 @@
 export class Enemy {
-    constructor(id, relX, relY, speed, relWidth, relHeight, color, spacing, dir, column) {
+    constructor(id, relX, relY, relSpeed, relWidth, relHeight, color, spacing, dir, column) {
         this.id = id;
         this.relX = relX;
         this.relY = relY;
-        this.speed = speed;
+        this.relSpeed = relSpeed;
         this.relWidth = relWidth;
         this.relHeight = relHeight;
         this.color = color;
@@ -14,7 +14,7 @@ export class Enemy {
     }
 
     update(deltatime, gctx) {
-        this.relX = this.relX + (this.dir * this.speed * deltatime / gctx.canvas.width);
+        this.relX = this.relX + (this.dir * this.relSpeed * deltatime);
     }
 
     shiftDown() {
@@ -25,7 +25,7 @@ export class Enemy {
     isOnEdge(deltatime, gctx) {
         // Minimum distance from edge is made to be same as space between two enemies
         const edgeSpace = this.spacing + this.relWidth / 2;
-        return (this.relX + this.dir * this.speed * deltatime / gctx.canvas.width < edgeSpace || this.relX + this.dir * this.speed * deltatime / gctx.canvas.width > 1 - edgeSpace);
+        return (this.relX + this.dir * this.relSpeed * deltatime < edgeSpace || this.relX + this.dir * this.relSpeed * deltatime > 1 - edgeSpace);
     }
 
     draw(gctx) {

@@ -1,8 +1,8 @@
 export class Bullet {
-    constructor(relX, relY, speed, relWidth, relHeight, color) {
+    constructor(relX, relY, relSpeed, relWidth, relHeight, color) {
         this.relX = relX;
         this.relY = relY;
-        this.speed = speed;
+        this.relSpeed = relSpeed;
         this.relWidth = relWidth;
         this.relHeight = relHeight;
         this.color = color;
@@ -13,8 +13,8 @@ export class Bullet {
      * @param {number} deltatime
      * @param {CanvasRenderingContext2D} gctx
      */
-    update(deltatime, gctx) {
-        this.relY -= this.speed * deltatime / gctx.canvas.height;
+    update(deltatime) {
+        this.relY -= this.relSpeed * deltatime;
     }
 
     /**

@@ -32,14 +32,15 @@ function game() {
     // Enemies Array
     const enemies = [];
     const enemyCount = 5, enemyRelWidth = 0.05, enemyRelHeight = 0.05;
-    const enemyRelSpacing = 0.03;
+    const enemyRelSpacing = 0.01;
     let dir = 1;
     for (let i = 0; i < enemyCount; i++) {
         // Minimum distance from edge is made to be same as space between two enemies
         enemies.push(new Enemy(
             i,
             (i + 1) * enemyRelSpacing + (i + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-            0.1, 100,
+            0.1, // RelY
+            0.3, // RelSpeed
             enemyRelWidth,
             enemyRelHeight,
             "red",
@@ -137,14 +138,14 @@ function game() {
                 }
             }
         }
-        
+
         if (player1.respawnTimer <= 0 && !player1.isAlive) {
             player1.respawn(playerRelX, playerRelY);
             console.log("Player respawned");
         }
 
         bullets.forEach((bullet, index) => {
-            bullet.update(deltatime, gctx);
+            bullet.update(deltatime);
             if (bullet.isOffScreen()) {
                 bullets.splice(index, 1);
             }

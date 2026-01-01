@@ -116,7 +116,7 @@ export class Player {
     shoot() {
         if (this.shootCooldown > 0) return null;
         this.shootCooldown = 0.5;
-        const bullet = new Bullet(this.relX, this.relY, this.maxSpeed * 2, 0.005, 0.02, "yellow");
+        const bullet = new Bullet(this.relX, this.relY, 1, 0.005, 0.02, "yellow");
         return bullet;
     }
 
