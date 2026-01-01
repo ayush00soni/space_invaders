@@ -24,14 +24,14 @@ function game() {
     // Main Player
     const playerRelX = 0.5;
     const playerRelY = 0.9;
-    const player1 = new Player(playerRelX, playerRelY, 400, 300, 0.05, 0.05, "green");
+    const player1 = new Player(playerRelX, playerRelY, 1, 0.5, 0.05, 0.05, "green");
 
     // Bullets Array
     const bullets = [];
 
     // Enemies Array
     const enemies = [];
-    const enemyCount = 5, enemyRelWidth = 0.05, enemyRelHeight = 0.05;
+    const enemyCount = 0, enemyRelWidth = 0.05, enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
     let dir = 1;
     for (let i = 0; i < enemyCount; i++) {

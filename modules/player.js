@@ -4,17 +4,17 @@ export class Player {
     /**
      * @param {number} relX
      * @param {number} relY
-     * @param {number} maxSpeed
-     * @param {number} acceleration
+     * @param {number} relMaxSpeed
+     * @param {number} relAcceleration
      * @param {number} width
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, maxSpeed, acceleration, relWidth, relHeight, color) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, relHeight, color) {
         this.relX = relX;
         this.relY = relY;
-        this.maxSpeed = maxSpeed;
-        this.acceleration = acceleration;
+        this.relMaxSpeed = relMaxSpeed;
+        this.relAcceleration = relAcceleration;
         this.vx = 0;
         this.vy = 0;
         this.relWidth = relWidth;
@@ -71,31 +71,36 @@ export class Player {
 
     }
 
-    accelerate(deltatime, input) {
+    accelerate(deltatime, input, gctx) {
         let accX = false;
         let accY = false;
+        this.acceleration = {
+            x: this.relAcceleration * gctx.canvas.width,
+            y: this.relAcceleration * gctx.canvas.height
+        }; // Convert to pixels/sec^2
+        this.maxSpeed = this.relMaxSpeed * Math.hypot(gctx.canvas.width, gctx.canvas.height); // Convert to pixels/sec using diagonal
         const decFactor = 8;
-        const decX = () => { this.vx = Math.max(0, Math.abs(this.vx) - decFactor * this.acceleration * deltatime) * Math.sign(this.vx); };
-        const decY = () => { this.vy = Math.max(0, Math.abs(this.vy) - decFactor * this.acceleration * deltatime) * Math.sign(this.vy); };
+        const decX = () => { this.vx = Math.max(0, Math.abs(this.vx) - decFactor * this.acceleration.x * deltatime) * Math.sign(this.vx); };
+        const decY = () => { this.vy = Math.max(0, Math.abs(this.vy) - decFactor * this.acceleration.y * deltatime) * Math.sign(this.vy); };
 
         if (input["ArrowUp"] || input["KeyW"]) {
             if (this.vy > 0) decY();
-            else this.vy -= this.acceleration * deltatime;
+            else this.vy -= this.acceleration.y * deltatime;
             accY = true;
         }
         if (input["ArrowDown"] || input["KeyS"]) {
             if (this.vy < 0) decY();
-            else this.vy += this.acceleration * deltatime;
+            else this.vy += this.acceleration.y * deltatime;
             accY = true;
         }
         if (input["ArrowLeft"] || input["KeyA"]) {
             if (this.vx > 0) decX();
-            else this.vx -= this.acceleration * deltatime;
+            else this.vx -= this.acceleration.x * deltatime;
             accX = true;
         }
         if (input["ArrowRight"] || input["KeyD"]) {
             if (this.vx < 0) decX();
-            else this.vx += this.acceleration * deltatime;
+            else this.vx += this.acceleration.x * deltatime;
             accX = true;
         }
 
@@ -116,7 +121,12 @@ export class Player {
     shoot() {
         if (this.shootCooldown > 0) return null;
         this.shootCooldown = 0.5;
-        const bullet = new Bullet(this.relX, this.relY, 1, 0.005, 0.02, "yellow");
+        const bullet = new Bullet(
+            this.relX, this.relY,
+            1,
+            0.005, 0.02,
+            "yellow"
+        );
         return bullet;
     }
 
@@ -129,7 +139,7 @@ export class Player {
         if (this.isAlive) {
             this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
             // Handle input for acceleration
-            this.accelerate(deltatime, input);
+            this.accelerate(deltatime, input, gctx);
 
             // Handle input for movement
             this.move(deltatime, gctx);
