@@ -13,6 +13,8 @@ export class Player {
     constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, relHeight, color) {
         this.relX = relX;
         this.relY = relY;
+        this.relXi = relX; // Initial positions for respawn
+        this.relYi = relY; // Initial positions for respawn
         this.relMaxSpeed = relMaxSpeed;
         this.relAcceleration = relAcceleration;
         this.vx = 0;
@@ -22,7 +24,7 @@ export class Player {
         this.color = color;
         this.shootCooldown = 0;
         this.isAlive = true;
-        this.respawnDelay = 2;
+        this.respawnDelay = 1;
         this.respawnTimer = 0;
     }
     /**
@@ -145,9 +147,14 @@ export class Player {
 
             // Handle input for movement
             this.move(deltatime, gctx);
-        } else { // Player is dead
+        } else { // Player is dead#
             // Respawn logic
-
+            if (this.respawnTimer > 0) {
+                this.respawnTimer -= deltatime;
+            } else {
+                this.respawn();
+                console.log("Player respawned");
+            }
         }
     }
 
@@ -158,9 +165,9 @@ export class Player {
         this.respawnTimer = this.respawnDelay;
     }
 
-    respawn(relX, relY) {
-        this.relX = relX;
-        this.relY = relY;
+    respawn() {
+        this.relX = this.relXi;
+        this.relY = this.relYi;
         this.vx = 0;
         this.vy = 0;
         this.isAlive = true;

@@ -117,10 +117,9 @@ function game() {
         // Skip updates if game over
         if (gameOver) return;
 
-        if (player1.respawnTimer > 0) {
-            player1.respawnTimer -= deltatime;
-        } else {
-            player1.update(deltatime, input, gctx);
+        player1.update(deltatime, input, gctx);
+
+        if (player1.isAlive) {
 
             // Handle shooting
             if (input["Space"]) {
@@ -146,8 +145,7 @@ function game() {
         }
 
         if (player1.respawnTimer <= 0 && !player1.isAlive) {
-            player1.respawn(playerRelX, playerRelY);
-            console.log("Player respawned");
+
         }
 
         bullets.forEach((bullet, index) => {
