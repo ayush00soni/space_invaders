@@ -42,8 +42,8 @@ export class Player {
         return {
             x: gctx.canvas.width * this.relX - this.relWidth * gctx.canvas.width / 2,
             y: gctx.canvas.height * this.relY - this.relHeight * gctx.canvas.height / 2,
-            width: this.width * gctx.canvas.width,
-            height: this.height * gctx.canvas.height
+            width: this.relWidth * gctx.canvas.width,
+            height: this.relHeight * gctx.canvas.height
         };
     }
 
@@ -55,7 +55,6 @@ export class Player {
 
         this.relX += this.vx * deltatime;
         this.relY += this.vy * deltatime;
-
 
         this.width = gctx.canvas.width * this.relWidth;
         this.height = gctx.canvas.height * this.relHeight;
@@ -72,10 +71,12 @@ export class Player {
         let accX = false;
         let accY = false;
         const decFactor = 8;
+
         const decX = () => {
             this.vx = Math.max(0, Math.abs(this.vx) - decFactor * this.relAcceleration * deltatime) *
                 Math.sign(this.vx);
         };
+
         const decY = () => {
             this.vy = Math.max(0, Math.abs(this.vy) - decFactor * this.relAcceleration * deltatime) *
                 Math.sign(this.vy);
@@ -86,16 +87,19 @@ export class Player {
             else this.vy -= this.relAcceleration * deltatime;
             accY = true;
         }
+
         if (input["ArrowDown"] || input["KeyS"]) {
             if (this.vy < 0) decY();
             else this.vy += this.relAcceleration * deltatime;
             accY = true;
         }
+
         if (input["ArrowLeft"] || input["KeyA"]) {
             if (this.vx > 0) decX();
             else this.vx -= this.relAcceleration * deltatime;
             accX = true;
         }
+
         if (input["ArrowRight"] || input["KeyD"]) {
             if (this.vx < 0) decX();
             else this.vx += this.relAcceleration * deltatime;
