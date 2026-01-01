@@ -21,10 +21,10 @@ export class Bullet {
     * @param {CanvasRenderingContext2D} gctx
     */
     draw(gctx) {
-        this.x = gctx.canvas.width * this.relX - this.width / 2;
-        this.y = gctx.canvas.height * this.relY - this.height / 2;
         this.width = gctx.canvas.width * this.relWidth;
         this.height = gctx.canvas.height * this.relHeight;
+        this.x = gctx.canvas.width * this.relX - this.width / 2;
+        this.y = gctx.canvas.height * this.relY - this.height / 2;
         gctx.fillStyle = this.color;
         gctx.fillRect(this.x, this.y, this.width, this.height);
     }

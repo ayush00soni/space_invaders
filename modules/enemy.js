@@ -13,7 +13,7 @@ export class Enemy {
         this.active = true;
     }
 
-    update(deltatime, gctx) {
+    update(deltatime) {
         this.relX = this.relX + (this.dir * this.relSpeed * deltatime);
     }
 

@@ -53,11 +53,8 @@ export class Player {
     */
     move(deltatime, gctx) {
 
-        const relDispX = this.vx * deltatime / gctx.canvas.width;
-        const relDispY = this.vy * deltatime / gctx.canvas.height;
-
-        this.relX += relDispX;
-        this.relY += relDispY;
+        this.relX += this.vx * deltatime;
+        this.relY += this.vy * deltatime;
 
 
         this.width = gctx.canvas.width * this.relWidth;
@@ -74,33 +71,34 @@ export class Player {
     accelerate(deltatime, input, gctx) {
         let accX = false;
         let accY = false;
-        this.acceleration = {
-            x: this.relAcceleration * gctx.canvas.width,
-            y: this.relAcceleration * gctx.canvas.height
-        }; // Convert to pixels/sec^2
-        this.maxSpeed = this.relMaxSpeed * Math.hypot(gctx.canvas.width, gctx.canvas.height); // Convert to pixels/sec using diagonal
         const decFactor = 8;
-        const decX = () => { this.vx = Math.max(0, Math.abs(this.vx) - decFactor * this.acceleration.x * deltatime) * Math.sign(this.vx); };
-        const decY = () => { this.vy = Math.max(0, Math.abs(this.vy) - decFactor * this.acceleration.y * deltatime) * Math.sign(this.vy); };
+        const decX = () => {
+            this.vx = Math.max(0, Math.abs(this.vx) - decFactor * this.relAcceleration * deltatime) *
+                Math.sign(this.vx);
+        };
+        const decY = () => {
+            this.vy = Math.max(0, Math.abs(this.vy) - decFactor * this.relAcceleration * deltatime) *
+                Math.sign(this.vy);
+        };
 
         if (input["ArrowUp"] || input["KeyW"]) {
             if (this.vy > 0) decY();
-            else this.vy -= this.acceleration.y * deltatime;
+            else this.vy -= this.relAcceleration * deltatime;
             accY = true;
         }
         if (input["ArrowDown"] || input["KeyS"]) {
             if (this.vy < 0) decY();
-            else this.vy += this.acceleration.y * deltatime;
+            else this.vy += this.relAcceleration * deltatime;
             accY = true;
         }
         if (input["ArrowLeft"] || input["KeyA"]) {
             if (this.vx > 0) decX();
-            else this.vx -= this.acceleration.x * deltatime;
+            else this.vx -= this.relAcceleration * deltatime;
             accX = true;
         }
         if (input["ArrowRight"] || input["KeyD"]) {
             if (this.vx < 0) decX();
-            else this.vx += this.acceleration.x * deltatime;
+            else this.vx += this.relAcceleration * deltatime;
             accX = true;
         }
 
@@ -110,8 +108,8 @@ export class Player {
 
         // Clamp speed to maxSpeed
         const speed = Math.hypot(this.vx, this.vy);
-        if (speed > this.maxSpeed) {
-            const scale = this.maxSpeed / speed;
+        if (speed > this.relMaxSpeed) {
+            const scale = this.relMaxSpeed / speed;
             this.vx *= scale;
             this.vy *= scale;
         }
