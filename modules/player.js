@@ -26,6 +26,7 @@ export class Player {
         this.isAlive = true;
         this.respawnDelay = 1;
         this.respawnTimer = 0;
+        this.decFactor = 5; // Deceleration factor
     }
     /**
     * @param {CanvasRenderingContext2D} gctx
@@ -69,48 +70,27 @@ export class Player {
 
     }
 
-    accelerate(deltatime, input, gctx) {
-        let accX = false;
-        let accY = false;
-        const decFactor = 8;
+    accelerate(deltatime, input) {
 
-        const decX = () => {
-            this.vx = Math.max(0, Math.abs(this.vx) - decFactor * this.relAcceleration * deltatime) *
-                Math.sign(this.vx);
-        };
+        const dirX = (Number(input["ArrowRight"] || input["KeyD"]) -
+            Number(input["ArrowLeft"] || input["KeyA"]));
 
-        const decY = () => {
-            this.vy = Math.max(0, Math.abs(this.vy) - decFactor * this.relAcceleration * deltatime) *
-                Math.sign(this.vy);
-        };
+        const dirY = (Number(input["ArrowDown"] || input["KeyS"]) -
+            Number(input["ArrowUp"] || input["KeyW"]));
 
-        if (input["ArrowUp"] || input["KeyW"]) {
-            if (this.vy > 0) decY();
-            else this.vy -= this.relAcceleration * deltatime;
-            accY = true;
+        // X direction
+        if (!dirX) { // Deceleration
+            this.vx = Math.max(0, Math.abs(this.vx) - this.decFactor * this.relAcceleration * deltatime) * Math.sign(this.vx);
+        } else {
+            this.vx += dirX * this.relAcceleration * deltatime;
         }
 
-        if (input["ArrowDown"] || input["KeyS"]) {
-            if (this.vy < 0) decY();
-            else this.vy += this.relAcceleration * deltatime;
-            accY = true;
+        // Y direction
+        if (!dirY) { // Deceleration
+            this.vy = Math.max(0, Math.abs(this.vy) - this.decFactor * this.relAcceleration * deltatime) * Math.sign(this.vy);
+        } else {
+            this.vy += dirY * this.relAcceleration * deltatime;
         }
-
-        if (input["ArrowLeft"] || input["KeyA"]) {
-            if (this.vx > 0) decX();
-            else this.vx -= this.relAcceleration * deltatime;
-            accX = true;
-        }
-
-        if (input["ArrowRight"] || input["KeyD"]) {
-            if (this.vx < 0) decX();
-            else this.vx += this.relAcceleration * deltatime;
-            accX = true;
-        }
-
-        if (!(accX)) decX();
-        if (!(accY)) decY();
-
 
         // Clamp speed to maxSpeed
         const speed = Math.hypot(this.vx, this.vy);
@@ -143,7 +123,7 @@ export class Player {
         if (this.isAlive) {
             this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
             // Handle input for acceleration
-            this.accelerate(deltatime, input, gctx);
+            this.accelerate(deltatime, input);
 
             // Handle input for movement
             this.move(deltatime, gctx);

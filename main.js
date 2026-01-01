@@ -78,31 +78,23 @@ function game() {
     requestAnimationFrame(gameloop);
 
     // Input Handling
-    const input = {};
+    const input = {
+        "ArrowUp": false,
+        "ArrowDown": false,
+        "ArrowLeft": false,
+        "ArrowRight": false,
+        "Space": false,
+        "KeyW": false,
+        "KeyA": false,
+        "KeyS": false,
+        "KeyD": false
+    };
 
     window.addEventListener("keydown", (e) => {
         if (["ArrowUp", "ArrowDown", "ArrowLeft",
             "ArrowRight", "Space", "KeyW",
             "KeyA", "KeyS", "KeyD"].includes(e.code)) {
             e.preventDefault();
-
-            // Prevent opposite directions being active simultaneously
-            if (e.code === "ArrowUp" || e.code === "KeyW") {
-                input["ArrowDown"] = false;
-                input["KeyS"] = false;
-            }
-            if (e.code === "ArrowLeft" || e.code === "KeyA") {
-                input["ArrowRight"] = false;
-                input["KeyD"] = false;
-            }
-            if (e.code === "ArrowDown" || e.code === "KeyS") {
-                input["ArrowUp"] = false;
-                input["KeyW"] = false;
-            }
-            if (e.code === "ArrowRight" || e.code === "KeyD") {
-                input["ArrowLeft"] = false;
-                input["KeyA"] = false;
-            }
 
             input[e.code] = true;
         }
