@@ -2,20 +2,51 @@ import { Player } from "./modules/player.js";
 import { Enemy } from "./modules/enemy.js";
 import { collisionDetected } from "./modules/collision.js";
 
+let isGameRunning = false;
+
+// Input Handling
+const input = {
+    "ArrowUp": false,
+    "ArrowDown": false,
+    "ArrowLeft": false,
+    "ArrowRight": false,
+    "Space": false,
+    "KeyW": false,
+    "KeyA": false,
+    "KeyS": false,
+    "KeyD": false
+};
+
+window.addEventListener("keydown", (e) => {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft",
+        "ArrowRight", "Space", "KeyW",
+        "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+        e.preventDefault();
+
+        input[e.code] = true;
+    }
+});
+
+window.addEventListener("keyup", (e) => {
+    input[e.code] = false;
+});
+
+// Resize canvas to be square and fit within window
+function resizeCanvas() {
+    gamecanvas.height = Math.min(window.innerHeight, window.innerWidth);
+    gamecanvas.width = gamecanvas.height;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
 function game() {
+    isGameRunning = true;
     /** @type {HTMLCanvasElement} */
     const gamecanvas = document.getElementById("gamecanvas");
 
     /** @type {CanvasRenderingContext2D} */
     const gctx = gamecanvas.getContext("2d");
 
-    // Resize canvas to be square and fit within window
-    function resizeCanvas() {
-        gamecanvas.height = Math.min(window.innerHeight, window.innerWidth);
-        gamecanvas.width = gamecanvas.height;
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
 
     let gameOver = false; // For game over state
     let lives = 3; // Player lives
@@ -35,25 +66,27 @@ function game() {
 
     // Enemies Array
     const enemies = [];
-    const enemyCount = 5,
+    const enemyColumns = 10, enemyRows = 8,
         enemyRelWidth = 0.05,
         enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
     let dir = 1;
-    for (let i = 0; i < enemyCount; i++) {
-        // Minimum distance from edge is made to be same as space between two enemies
-        enemies.push(new Enemy(
-            i,
-            (i + 1) * enemyRelSpacing + (i + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-            0.1, // RelY
-            0.3, // RelSpeed
-            enemyRelWidth,
-            enemyRelHeight,
-            "red",
-            enemyRelSpacing,
-            dir,
-            0
-        ));
+    for (let i = 0; i < enemyRows; i++) {
+        for (let j = 0; j < enemyColumns; j++) {
+            // Minimum distance from edge is made to be same as space between two enemies
+            enemies.push(new Enemy(
+                j,
+                (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
+                (i) * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
+                0.3, // RelSpeed
+                enemyRelWidth,
+                enemyRelHeight,
+                "red",
+                enemyRelSpacing,
+                dir,
+                0
+            ));
+        }
     }
 
     let lasttime = 0; // For delta time calculation
@@ -73,36 +106,12 @@ function game() {
         lasttime = timestamp;
         update(deltatime);
         draw();
+        if (gameOver) return;
         requestAnimationFrame(gameloop);
     }
     requestAnimationFrame(gameloop);
 
-    // Input Handling
-    const input = {
-        "ArrowUp": false,
-        "ArrowDown": false,
-        "ArrowLeft": false,
-        "ArrowRight": false,
-        "Space": false,
-        "KeyW": false,
-        "KeyA": false,
-        "KeyS": false,
-        "KeyD": false
-    };
 
-    window.addEventListener("keydown", (e) => {
-        if (["ArrowUp", "ArrowDown", "ArrowLeft",
-            "ArrowRight", "Space", "KeyW",
-            "KeyA", "KeyS", "KeyD"].includes(e.code)) {
-            e.preventDefault();
-
-            input[e.code] = true;
-        }
-    });
-
-    window.addEventListener("keyup", (e) => {
-        input[e.code] = false;
-    });
 
     // Update function
     function update(deltatime) {
@@ -134,10 +143,6 @@ function game() {
                     }
                 }
             }
-        }
-
-        if (player1.respawnTimer <= 0 && !player1.isAlive) {
-
         }
 
         bullets.forEach((bullet, index) => {
@@ -232,13 +237,25 @@ function game() {
 
         // Game Over Screen
         if (gameOver) {
+            const gap = 30;
             gctx.fillStyle = "white";
             gctx.font = "40px monospace";
             gctx.textAlign = "center";
-            gctx.fillText("GAME OVER", gamecanvas.width / 2, gamecanvas.height / 2);
-            return;
+            gctx.fillText("GAME OVER", gamecanvas.width / 2, gamecanvas.height / 2 - gap / 2);
+            gctx.fillStyle = "white";
+            gctx.font = "20px monospace";
+            gctx.textAlign = "center";
+            gctx.fillText("Press Enter to Restart", gamecanvas.width / 2, gamecanvas.height / 2 + gap / 2);
+            isGameRunning = false;
         }
     }
 }
 
 window.addEventListener("DOMContentLoaded", game);
+
+// Reset game
+window.addEventListener("keydown", (e) => {
+    if (e.code === "Enter" && !isGameRunning) {
+        game();
+    }
+});

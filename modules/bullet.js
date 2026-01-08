@@ -31,8 +31,8 @@ export class Bullet {
 
     getBounds(gctx) {
         return {
-            x: gctx.canvas.width * this.relX - this.width / 2,
-            y: gctx.canvas.height * this.relY - this.height / 2,
+            x: gctx.canvas.width * this.relX - gctx.canvas.width * this.relWidth / 2,
+            y: gctx.canvas.height * this.relY - gctx.canvas.height * this.relHeight / 2,
             width: gctx.canvas.width * this.relWidth,
             height: gctx.canvas.height * this.relHeight
         };

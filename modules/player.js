@@ -59,14 +59,11 @@ export class Player {
         this.relX += this.vx * deltatime;
         this.relY += this.vy * deltatime;
 
-        this.width = gctx.canvas.width * this.relWidth;
-        this.height = gctx.canvas.height * this.relHeight;
-
         // Keep player within screen bounds
-        this.relX = Math.max(this.width / (2 * gctx.canvas.width),
-            Math.min(1 - this.width / (2 * gctx.canvas.width), this.relX));
-        this.relY = Math.max(this.height / (2 * gctx.canvas.height),
-            Math.min(1 - this.height / (2 * gctx.canvas.height), this.relY));
+        this.relX = Math.max(this.relWidth / 2,
+            Math.min(1 - this.relWidth / 2, this.relX));
+        this.relY = Math.max(this.relHeight / 2,
+            Math.min(1 - this.relHeight / 2, this.relY));
 
     }
 
@@ -107,7 +104,7 @@ export class Player {
         this.shootCooldown = 0.5;
         const bullet = new Bullet(
             this.relX, this.relY,
-            1,
+            0.8,
             0.005, 0.02,
             "yellow"
         );
