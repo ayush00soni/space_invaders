@@ -1,6 +1,7 @@
 import { Player } from "./modules/player.js";
 import { Enemy } from "./modules/enemy.js";
 import { collisionDetected } from "./modules/collision.js";
+import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 
 let isGameRunning = false;
 
@@ -70,6 +71,7 @@ function game() {
         enemyRelWidth = 0.05,
         enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
+    const enemyDeadLineY = playerRelY - player1.relHeight / 2 - 0.05; // Deadline above player
     let dir = 1;
     for (let i = 0; i < enemyRows; i++) {
         for (let j = 0; j < enemyColumns; j++) {
@@ -194,11 +196,11 @@ function game() {
             }
         }
 
-        // Enemy reaches bottom (game over)
+        // Enemy reaches deadlin (game over)
         for (const enemy of enemies) {
-            if (enemy.y + enemy.height >= gctx.canvas.height) {
+            if (enemy.relY + enemy.relHeight / 2 >= enemyDeadLineY) {
                 gameOver = true;
-                console.log("Enemy reached bottom");
+                console.log("Enemy reached deadline.");
                 break;
             }
         }
@@ -213,6 +215,14 @@ function game() {
     function draw() {
         // Clear canvas
         gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
+
+        // Draw Deadline
+        gctx.strokeStyle = "yellow";
+        gctx.lineWidth = 2;
+        gctx.beginPath();
+        gctx.moveTo(0, enemyDeadLineY * gctx.canvas.height);
+        gctx.lineTo(gctx.canvas.width, enemyDeadLineY * gctx.canvas.height);
+        gctx.stroke();
 
         // Draw bullets
         bullets.forEach((bullet) => {
