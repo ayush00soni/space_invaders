@@ -196,7 +196,7 @@ function game() {
             }
         }
 
-        // Enemy reaches deadlin (game over)
+        // Enemy reaches deadline (game over)
         for (const enemy of enemies) {
             if (enemy.relY + enemy.relHeight / 2 >= enemyDeadLineY) {
                 gameOver = true;
@@ -217,7 +217,7 @@ function game() {
         gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
 
         // Draw Deadline
-        gctx.strokeStyle = "yellow";
+        gctx.strokeStyle = "red";
         gctx.lineWidth = 2;
         gctx.beginPath();
         gctx.moveTo(0, enemyDeadLineY * gctx.canvas.height);
