@@ -1,5 +1,4 @@
 import { Player } from "./modules/player.js";
-import { Enemy } from "./modules/enemy.js";
 import { collisionDetected } from "./modules/collision.js";
 import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 
@@ -50,6 +49,7 @@ function game() {
 
 
     let gameOver = false; // For game over state
+    let playerWon = false; // For win state
     let lives = 3; // Player lives
     let score = 0; // Player score
 
@@ -58,7 +58,7 @@ function game() {
     const playerRelY = 0.9;
     const player1 = new Player(
         playerRelX, playerRelY,
-        0.5, 0.5,
+        0.7, 0.6,
         0.05, 0.05,
         "green");
 
@@ -67,29 +67,14 @@ function game() {
 
     // Enemies Array
     const enemies = [];
-    const enemyColumns = 10, enemyRows = 8,
-        enemyRelWidth = 0.05,
-        enemyRelHeight = 0.05;
-    const enemyRelSpacing = 0.01;
     const enemyDeadLineY = playerRelY - player1.relHeight / 2 - 0.05; // Deadline above player
-    let dir = 1;
-    for (let i = 0; i < enemyRows; i++) {
-        for (let j = 0; j < enemyColumns; j++) {
-            // Minimum distance from edge is made to be same as space between two enemies
-            enemies.push(new Enemy(
-                j,
-                (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-                (i) * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
-                0.3, // RelSpeed
-                enemyRelWidth,
-                enemyRelHeight,
-                "red",
-                enemyRelSpacing,
-                dir,
-                0
-            ));
-        }
-    }
+    let wavenumber = 0;
+    const maxGridSize = {
+        rows: 8,
+        columns: 10
+    };
+    const enemyWaveDelay = 2; // Seconds between waves
+    let enemyWaveTimer = 0;
 
     let lasttime = 0; // For delta time calculation
     // Game Loop
@@ -108,19 +93,33 @@ function game() {
         lasttime = timestamp;
         update(deltatime);
         draw();
-        if (gameOver) return;
+        if (gameOver || playerWon) return;
         requestAnimationFrame(gameloop);
     }
     requestAnimationFrame(gameloop);
 
 
+    let newEnemies = [];
+    let isMaxWave = false;
 
     // Update function
     function update(deltatime) {
         // Skip updates if game over
-        if (gameOver) return;
+        if (gameOver || playerWon) return;
 
         player1.update(deltatime, input, gctx);
+
+        if (enemies.length === 0) {
+            enemyWaveTimer += deltatime;
+            if (isMaxWave) { playerWon = true; console.log("Player Won: All waves cleared!"); }
+            else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
+                wavenumber++;
+                console.log("enemy wave:", wavenumber);
+
+                [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx, maxGridSize);
+                enemies.push(...newEnemies);
+            }
+        }
 
         if (player1.isAlive) {
 
@@ -200,7 +199,7 @@ function game() {
         for (const enemy of enemies) {
             if (enemy.relY + enemy.relHeight / 2 >= enemyDeadLineY) {
                 gameOver = true;
-                console.log("Enemy reached deadline.");
+                console.log("Game Over: Enemy reached deadline.");
                 break;
             }
         }
@@ -258,14 +257,30 @@ function game() {
             gctx.fillText("Press Enter to Restart", gamecanvas.width / 2, gamecanvas.height / 2 + gap / 2);
             isGameRunning = false;
         }
+
+        // Win Screen
+        if (playerWon) {
+            const gap = 30;
+            gctx.fillStyle = "white";
+            gctx.font = "40px monospace";
+            gctx.textAlign = "center";
+            gctx.fillText("YOU WIN!", gamecanvas.width / 2, gamecanvas.height / 2 - gap / 2);
+            gctx.fillStyle = "white";
+            gctx.font = "20px monospace";
+            gctx.textAlign = "center";
+            gctx.fillText("Press Enter to Restart", gamecanvas.width / 2, gamecanvas.height / 2 + gap / 2);
+            isGameRunning = false;
+        }
     }
 }
 
 window.addEventListener("DOMContentLoaded", game);
 
 // Reset game
-window.addEventListener("keydown", (e) => {
-    if (e.code === "Enter" && !isGameRunning) {
-        game();
-    }
+['keydown', 'click'].forEach(eventType => {
+    window.addEventListener(eventType, (e) => {
+        if ((e.type === "click" || e.code === "Enter") && !isGameRunning) {
+            game();
+        }
+    });
 });
