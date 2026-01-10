@@ -2,6 +2,28 @@ import { Player } from "./modules/player.js";
 import { collisionDetected } from "./modules/collision.js";
 import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 
+// UI Setup
+const hud = document.getElementById("hud");
+const scoreDisplay = document.getElementById("score-display");
+const livesDisplay = document.getElementById("lives-display");
+
+// Start Screen Setup
+const startScreen = document.getElementById("start-screen");
+const startButton = document.getElementById("start-button");
+
+// Game Over/Win Screen Setup
+const gameOverWinScreen = document.getElementById("game-over-win-screen");
+const finalScoreDisplay = document.getElementById("final-score");
+const restartButton = document.getElementById("restart-button");
+
+
+// Game Canvas Setup
+/** @type {HTMLCanvasElement} */
+const gamecanvas = document.getElementById("gamecanvas");
+
+/** @type {CanvasRenderingContext2D} */
+const gctx = gamecanvas.getContext("2d");
+
 let isGameRunning = false;
 
 // Input Handling
@@ -36,17 +58,12 @@ function resizeCanvas() {
     gamecanvas.height = Math.min(window.innerHeight, window.innerWidth);
     gamecanvas.width = gamecanvas.height;
 }
+
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 function game() {
     isGameRunning = true;
-    /** @type {HTMLCanvasElement} */
-    const gamecanvas = document.getElementById("gamecanvas");
-
-    /** @type {CanvasRenderingContext2D} */
-    const gctx = gamecanvas.getContext("2d");
-
 
     let gameOver = false; // For game over state
     let playerWon = false; // For win state
@@ -274,13 +291,8 @@ function game() {
     }
 }
 
-window.addEventListener("DOMContentLoaded", game);
-
-// Reset game
-['keydown', 'click'].forEach(eventType => {
-    window.addEventListener(eventType, (e) => {
-        if ((e.type === "click" || e.code === "Enter") && !isGameRunning) {
-            game();
-        }
-    });
-});
+startButton.addEventListener("click", () => {
+    startScreen.classList.add("hidden");
+    hud.classList.remove("hidden");
+    game();
+ });

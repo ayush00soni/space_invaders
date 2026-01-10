@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Invaders</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
-<body>
-    <canvas id = "gamecanvas">
 
-    </canvas>
+<body>
+    <div id="game-container">
+        <div id="hud" class="hidden">
+            <span id="score-display"></span>
+            <span id="lives-display"></span>
+        </div>
+        <div id="start-screen">
+            <h1 id="title">SPACE INVADERS</h1>
+            <button id="start-button">Start Game</button>
+        </div>
+        <div id="game-over-win-screen" class="hidden">
+            <h1 id="game-over-title">GAME OVER</h1>
+            <h1 id="win-title">YOU WIN!</h1>
+            <p id="final-score"></p>
+            <button id="restart-button">Restart Game</button>
+        </div>
+        <canvas id="gamecanvas">
+
+        </canvas>
+    </div>
     <script src="main.js" type="module"></script>
 </body>
+
 </html>
