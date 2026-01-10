@@ -13,7 +13,9 @@ const startButton = document.getElementById("start-button");
 
 // Game Over/Win Screen Setup
 const gameOverWinScreen = document.getElementById("game-over-win-screen");
-const finalScoreDisplay = document.getElementById("final-score");
+const gameOverTitle = document.getElementById("game-over-title");
+const winTitle = document.getElementById("win-title");
+const finalScoreDisplay = document.getElementById("final-score-display");
 const restartButton = document.getElementById("restart-button");
 
 
@@ -110,7 +112,7 @@ function game() {
         lasttime = timestamp;
         update(deltatime);
         draw();
-        if (gameOver || playerWon) return;
+        if (!isGameRunning) return;
         requestAnimationFrame(gameloop);
     }
     requestAnimationFrame(gameloop);
@@ -122,7 +124,7 @@ function game() {
     // Update function
     function update(deltatime) {
         // Skip updates if game over
-        if (gameOver || playerWon) return;
+        if (!isGameRunning) return;
 
         player1.update(deltatime, input, gctx);
 
@@ -130,6 +132,7 @@ function game() {
             enemyWaveTimer += deltatime;
             // Delete all existing bullets
             bullets.length = 0;
+            // TODO: Disable shooting properly during wave transition
             if (isMaxWave) { playerWon = true; console.log("Player Won: All waves cleared!"); }
             else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
                 enemyWaveTimer = 0;
@@ -258,45 +261,36 @@ function game() {
         });
 
         // Score and Lives HUD
-        gctx.fillStyle = "white";
-        gctx.font = "20px monospace";
-        gctx.textAlign = "left";
 
-        gctx.fillText(`Score: ${score}`, 20, 30);
-        gctx.fillText(`Lives: ${lives}`, 20, 60);
+        scoreDisplay.textContent = `Score: ${score}`;
+        livesDisplay.textContent = `Lives: ${lives}`;
 
-        // Game Over Screen
-        if (gameOver) {
-            const gap = 30;
-            gctx.fillStyle = "white";
-            gctx.font = "40px monospace";
-            gctx.textAlign = "center";
-            gctx.fillText("GAME OVER", gamecanvas.width / 2, gamecanvas.height / 2 - gap / 2);
-            gctx.fillStyle = "white";
-            gctx.font = "20px monospace";
-            gctx.textAlign = "center";
-            gctx.fillText("Press Enter to Restart", gamecanvas.width / 2, gamecanvas.height / 2 + gap / 2);
+        // Game Over / Win Screen
+        if (gameOver || playerWon) {
+            gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
+            finalScoreDisplay.textContent = `Final Score: ${score}`;
+            gameOverWinScreen.classList.remove("hidden");
+            hud.classList.add("hidden");
             isGameRunning = false;
-        }
-
-        // Win Screen
-        if (playerWon) {
-            const gap = 30;
-            gctx.fillStyle = "white";
-            gctx.font = "40px monospace";
-            gctx.textAlign = "center";
-            gctx.fillText("YOU WIN!", gamecanvas.width / 2, gamecanvas.height / 2 - gap / 2);
-            gctx.fillStyle = "white";
-            gctx.font = "20px monospace";
-            gctx.textAlign = "center";
-            gctx.fillText("Press Enter to Restart", gamecanvas.width / 2, gamecanvas.height / 2 + gap / 2);
-            isGameRunning = false;
+            if (gameOver) {
+                gameOverTitle.classList.remove("hidden");
+                winTitle.classList.add("hidden");
+            } else if (playerWon) {
+                gameOverTitle.classList.add("hidden");
+                winTitle.classList.remove("hidden");
+            }
         }
     }
 }
 
 startButton.addEventListener("click", () => {
     startScreen.classList.add("hidden");
+    hud.classList.remove("hidden");
+    game();
+});
+
+restartButton.addEventListener("click", () => {
+    gameOverWinScreen.classList.add("hidden");
     hud.classList.remove("hidden");
     game();
 });

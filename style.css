@@ -40,7 +40,7 @@ body {
     justify-content: space-between;
     padding: 10px 20px;
     color: white;
-    font-size: 24px;
+    font-size: 35px;
 }
 
 #start-screen,
@@ -60,9 +60,24 @@ body {
 
 button {
     border: none;
+    margin: 10px 0;
+    cursor: pointer;
     padding: 5px 10px;
     font-size: 24px;
-    border-radius: 1px;
+    border-radius: 3px;
+    color: yellow;
+}
+
+#restart-button {
+    background-color: red;
+}
+
+#start-button {
+    background-color: blue;
+}
+
+#final-score-display {
+    font-size: 24px;
 }
 
 .hidden {
