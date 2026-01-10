@@ -26,7 +26,7 @@ export class Player {
         this.isAlive = true;
         this.respawnDelay = 1;
         this.respawnTimer = 0;
-        this.decFactor = 5; // Deceleration factor
+        this.decFactor = 6; // Deceleration factor
     }
     /**
     * @param {CanvasRenderingContext2D} gctx
@@ -76,14 +76,14 @@ export class Player {
             Number(input["ArrowUp"] || input["KeyW"]));
 
         // X direction
-        if (!dirX) { // Deceleration
+        if (!dirX || this.vx * dirX < 0) { // Deceleration
             this.vx = Math.max(0, Math.abs(this.vx) - this.decFactor * this.relAcceleration * deltatime) * Math.sign(this.vx);
         } else {
             this.vx += dirX * this.relAcceleration * deltatime;
         }
 
         // Y direction
-        if (!dirY) { // Deceleration
+        if (!dirY || this.vy * dirY < 0) { // Deceleration
             this.vy = Math.max(0, Math.abs(this.vy) - this.decFactor * this.relAcceleration * deltatime) * Math.sign(this.vy);
         } else {
             this.vy += dirY * this.relAcceleration * deltatime;
