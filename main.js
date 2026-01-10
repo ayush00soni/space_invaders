@@ -128,13 +128,17 @@ function game() {
 
         if (enemies.length === 0) {
             enemyWaveTimer += deltatime;
+            // Delete all existing bullets
+            bullets.length = 0;
             if (isMaxWave) { playerWon = true; console.log("Player Won: All waves cleared!"); }
             else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
+                enemyWaveTimer = 0;
                 wavenumber++;
                 console.log("enemy wave:", wavenumber);
 
                 [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx, maxGridSize);
                 enemies.push(...newEnemies);
+
             }
         }
 
@@ -295,4 +299,4 @@ startButton.addEventListener("click", () => {
     startScreen.classList.add("hidden");
     hud.classList.remove("hidden");
     game();
- });
+});
