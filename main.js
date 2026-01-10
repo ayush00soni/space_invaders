@@ -130,18 +130,24 @@ function game() {
 
         if (enemies.length === 0) {
             enemyWaveTimer += deltatime;
-            // Delete all existing bullets
-            bullets.length = 0;
-            // TODO: Disable shooting properly during wave transition
-            if (isMaxWave) { playerWon = true; console.log("Player Won: All waves cleared!"); }
-            else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
+            // Disable shooting properly during wave transition
+            player1.shootingEnabled = false;
+
+            if (isMaxWave) {
+                playerWon = true;
+                console.log("Player Won: All waves cleared!");
+            } else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
+                // Delete all existing bullets
+                bullets.length = 0;
+
                 enemyWaveTimer = 0;
                 wavenumber++;
                 console.log("enemy wave:", wavenumber);
 
                 [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx, maxGridSize);
                 enemies.push(...newEnemies);
-
+                // Re-enable shooting after new wave spawns
+                player1.shootingEnabled = true;
             }
         }
 

@@ -27,6 +27,7 @@ export class Player {
         this.respawnDelay = 1;
         this.respawnTimer = 0;
         this.decFactor = 6; // Deceleration factor
+        this.shootingEnabled = true;
     }
     /**
     * @param {CanvasRenderingContext2D} gctx
@@ -100,7 +101,7 @@ export class Player {
     }
 
     shoot() {
-        if (this.shootCooldown > 0) return null;
+        if (this.shootCooldown > 0 || !this.shootingEnabled) return null;
         this.shootCooldown = 0.5;
         const bullet = new Bullet(
             this.relX, this.relY,
