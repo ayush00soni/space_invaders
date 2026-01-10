@@ -14,8 +14,16 @@
 <body>
     <div id="game-container">
         <div id="hud" class="hidden">
-            <span id="score-display"></span>
-            <span id="lives-display"></span>
+            <button id="pause-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            </button>
+            <div id="score-lives">
+                <div id="score-display"></div>
+                <div id="lives-display"></div>
+            </div>
         </div>
         <div id="start-screen">
             <h1 id="title">SPACE INVADERS</h1>

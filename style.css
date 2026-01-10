@@ -76,6 +76,20 @@ button {
     background-color: blue;
 }
 
+#pause-button {
+    padding: 0;
+    background-color: white;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#pause-button svg {
+    fill: black;
+}
+
 #final-score-display {
     font-size: 24px;
 }
