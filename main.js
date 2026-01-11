@@ -307,6 +307,10 @@ startButton.addEventListener("click", () => {
     lives = 3;
     startScreen.classList.add("hidden");
     hud.classList.remove("hidden");
+    // Clear input states
+    for (const key in input) {
+        input[key] = false;
+    }
     game();
 });
 
@@ -316,6 +320,10 @@ restartButton.addEventListener("click", () => {
     lives = 3;
     gameOverWinScreen.classList.add("hidden");
     hud.classList.remove("hidden");
+    // Clear input states
+    for (const key in input) {
+        input[key] = false;
+    }
     game();
 });
 
