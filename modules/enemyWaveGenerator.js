@@ -3,8 +3,6 @@ import { Enemy } from "./enemy.js";
 /**
  *
  * @param {number} wavenumber
- * @param {CanvasRenderingContext2D} gctx
- * @param {{rows: number, columns: number}} maxGridSize
  * @returns {Enemy[], }
 */
 // TODO: Grid becomes assymetrical for odd number of columns; Fix that
@@ -30,6 +28,22 @@ export function generateEnemyWave(wavenumber) {
     const enemyRelWidth = 0.05, enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
     const enemyDirection = 1;
+
+    function generateEnemy(i, j) {
+        // Minimum distance from edge is made to be same as space between two enemies
+        return new Enemy(
+            (i * maxGridSize.columns) + j,
+            (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
+            i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
+            0.3, // RelSpeed
+            enemyRelWidth,
+            enemyRelHeight,
+            "red",
+            enemyRelSpacing,
+            enemyDirection,
+            0
+        );
+    }
     // Using a mirror system to create symmetrical enemy waves
 
     // Left half
@@ -69,19 +83,7 @@ export function generateEnemyWave(wavenumber) {
     for (let i = 0; i < enemyRows; i++) {
         for (let j = 0; j < halfColumns; j++) {
             if (activeSlots[slotIndex++]) {
-                // Minimum distance from edge is made to be same as space between two enemies
-                enemyArray.push(new Enemy(
-                    j,
-                    (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-                    i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
-                    0.3, // RelSpeed
-                    enemyRelWidth,
-                    enemyRelHeight,
-                    "red",
-                    enemyRelSpacing,
-                    enemyDirection,
-                    0
-                ));
+                enemyArray.push(generateEnemy(i, j));
             }
         }
 
@@ -91,19 +93,7 @@ export function generateEnemyWave(wavenumber) {
     for (let i = 0; i < enemyRows; i++) {
         for (let j = enemyColumns - 1; j >= halfColumns + (enemyColumns % 2); j--) {
             if (activeSlots[slotIndex++]) {
-                // Minimum distance from edge is made to be same as space between two enemies
-                enemyArray.push(new Enemy(
-                    j,
-                    (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-                    i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
-                    0.3, // RelSpeed
-                    enemyRelWidth,
-                    enemyRelHeight,
-                    "red",
-                    enemyRelSpacing,
-                    enemyDirection,
-                    0
-                ));
+                enemyArray.push(generateEnemy(i, j));
             }
         }
     }
@@ -120,19 +110,7 @@ export function generateEnemyWave(wavenumber) {
         slotIndex = 0;
         for (let i = 0; i < enemyRows; i++) {
             if (centerColSlots[slotIndex++]) {
-                // Minimum distance from edge is made to be same as space between two enemies
-                enemyArray.push(new Enemy(
-                    centerCol,
-                    (centerCol + 1) * enemyRelSpacing + (centerCol + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-                    i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
-                    0.3, // RelSpeed
-                    enemyRelWidth,
-                    enemyRelHeight,
-                    "red",
-                    enemyRelSpacing,
-                    enemyDirection,
-                    0
-                ));
+                enemyArray.push(generateEnemy(i, centerCol));
             }
         }
     }
