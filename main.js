@@ -6,6 +6,7 @@ import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 const hud = document.getElementById("hud");
 const scoreDisplay = document.getElementById("score-display");
 const livesDisplay = document.getElementById("lives-display");
+const pauseButton = document.getElementById("pause-button");
 
 // Start Screen Setup
 const startScreen = document.getElementById("start-screen");
@@ -18,6 +19,10 @@ const winTitle = document.getElementById("win-title");
 const finalScoreDisplay = document.getElementById("final-score-display");
 const restartButton = document.getElementById("restart-button");
 
+// Pause Screen Setup
+const resumeButton = document.getElementById("resume-button");
+const pauseScoreDisplay = document.getElementById("pause-score-display");
+const pauseLivesDisplay = document.getElementById("pause-lives-display");
 
 // Game Canvas Setup
 /** @type {HTMLCanvasElement} */
@@ -27,6 +32,7 @@ const gamecanvas = document.getElementById("gamecanvas");
 const gctx = gamecanvas.getContext("2d");
 
 let isGameRunning = false;
+let paused = false;
 
 // Input Handling
 const input = {
@@ -64,13 +70,14 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
+let lives = 3; // Player lives
+let score = 0; // Player score
+
 function game() {
     isGameRunning = true;
 
     let gameOver = false; // For game over state
     let playerWon = false; // For win state
-    let lives = 3; // Player lives
-    let score = 0; // Player score
 
     // Main Player
     const playerRelX = 0.5;
@@ -125,6 +132,9 @@ function game() {
     function update(deltatime) {
         // Skip updates if game over
         if (!isGameRunning) return;
+
+        // Pause functionality
+        if (paused) return;
 
         player1.update(deltatime, input, gctx);
 
@@ -245,6 +255,8 @@ function game() {
         // Clear canvas
         gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
 
+        if (paused) return;
+
         // Draw Deadline
         gctx.strokeStyle = "red";
         gctx.lineWidth = 2;
@@ -290,13 +302,33 @@ function game() {
 }
 
 startButton.addEventListener("click", () => {
+    // Reset game state
+    score = 0;
+    lives = 3;
     startScreen.classList.add("hidden");
     hud.classList.remove("hidden");
     game();
 });
 
 restartButton.addEventListener("click", () => {
+    // Reset game state
+    score = 0;
+    lives = 3;
     gameOverWinScreen.classList.add("hidden");
     hud.classList.remove("hidden");
     game();
+});
+
+pauseButton.addEventListener("click", () => {
+    paused = true;
+    pauseScoreDisplay.textContent = `Score: ${score}`;
+    pauseLivesDisplay.textContent = `Lives: ${lives}`;
+    document.getElementById("pause-screen").classList.remove("hidden");
+    hud.classList.add("hidden");
+});
+
+resumeButton.addEventListener("click", () => {
+    paused = false;
+    document.getElementById("pause-screen").classList.add("hidden");
+    hud.classList.remove("hidden");
 });
