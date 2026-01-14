@@ -1,16 +1,19 @@
 export class Enemy {
-    constructor(id, relX, relY, relSpeed, relWidth, relHeight, color, spacing, dir, column) {
+    constructor(id, relX, relY, relSpeed, relWidth, color, spacing, dir, column, gctx) {
         this.id = id;
         this.relX = relX;
         this.relY = relY;
         this.relSpeed = relSpeed;
-        this.relWidth = relWidth;
-        this.relHeight = relHeight;
         this.color = color;
         this.spacing = spacing;
         this.dir = dir;
         this.column = column;
         this.active = true;
+        this.image = new Image();
+        this.image.src = "assets/enemy.png";
+        this.relWidth = relWidth;
+        this.relHeight = this.relWidth;
+        this.gctx = gctx;
     }
 
     update(deltatime) {
@@ -30,11 +33,17 @@ export class Enemy {
 
     draw(gctx) {
         this.width = gctx.canvas.width * this.relWidth;
-        this.height = gctx.canvas.height * this.relHeight;
+        this.aspectRatio = this.image.naturalHeight / this.image.naturalWidth;
+        this.height = this.width * this.aspectRatio;
+        this.relHeight = this.height / gctx.canvas.height;
         this.x = gctx.canvas.width * this.relX - this.width / 2;
         this.y = gctx.canvas.height * this.relY - this.height / 2;
-        gctx.fillStyle = this.color;
-        gctx.fillRect(this.x, this.y, this.width, this.height);
+        if (this.image.complete) {
+            gctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        } else {
+            gctx.fillStyle = this.color;
+            gctx.fillRect(this.x, this.y, this.width, this.height);
+        }
     }
 
     getBounds(gctx) {

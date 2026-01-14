@@ -3,10 +3,11 @@ import { Enemy } from "./enemy.js";
 /**
  *
  * @param {number} wavenumber
+ * @param {CanvasRenderingContext2D} gctx
  * @returns {Enemy[], }
 */
 // TODO: Grid becomes assymetrical for odd number of columns; Fix that
-export function generateEnemyWave(wavenumber) {
+export function generateEnemyWave(wavenumber, gctx) {
     const maxGridSize = {
         rows: 8,
         columns: 10
@@ -37,11 +38,11 @@ export function generateEnemyWave(wavenumber) {
             i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
             0.3, // RelSpeed
             enemyRelWidth,
-            enemyRelHeight,
-            "red",
+            "gray",
             enemyRelSpacing,
             enemyDirection,
-            0
+            0,
+            gctx
         );
     }
     // Using a mirror system to create symmetrical enemy waves

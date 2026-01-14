@@ -10,7 +10,7 @@ export class Player {
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, relHeight, color) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, gctx) {
         this.relX = relX;
         this.relY = relY;
         this.relXi = relX; // Initial positions for respawn
@@ -19,8 +19,6 @@ export class Player {
         this.relAcceleration = relAcceleration;
         this.vx = 0;
         this.vy = 0;
-        this.relWidth = relWidth;
-        this.relHeight = relHeight;
         this.color = color;
         this.shootCooldown = 0;
         this.isAlive = true;
@@ -28,17 +26,28 @@ export class Player {
         this.respawnTimer = 0;
         this.decFactor = 6; // Deceleration factor
         this.shootingEnabled = true;
+        this.image = new Image();
+        this.image.src = "assets/player.png";
+        this.relWidth = relWidth;
+        this.relHeight = this.relWidth;
+        this.gctx = gctx;
     }
     /**
-    * @param {CanvasRenderingContext2D} gctx
+     * @param {CanvasRenderingContext2D} gctx
     */
     draw(gctx) {
         this.width = gctx.canvas.width * this.relWidth;
-        this.height = gctx.canvas.height * this.relHeight;
+        this.aspectRatio = this.image.naturalHeight / this.image.naturalWidth;
+        this.height = this.width * this.aspectRatio;
+        this.relHeight = this.height / gctx.canvas.height;
         this.x = gctx.canvas.width * this.relX - this.width / 2;
         this.y = gctx.canvas.height * this.relY - this.height / 2;
-        gctx.fillStyle = this.color;
-        gctx.fillRect(this.x, this.y, this.width, this.height);
+        if (this.image.complete) {
+            gctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        } else {
+            gctx.fillStyle = this.color;
+            gctx.fillRect(this.x, this.y, this.width, this.height);
+        }
 
     }
 
@@ -106,8 +115,8 @@ export class Player {
         const bullet = new Bullet(
             this.relX, this.relY,
             0.8,
-            0.005, 0.02,
-            "yellow"
+            0.005,
+            "blue", this.gctx
         );
         return bullet;
     }

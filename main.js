@@ -81,8 +81,12 @@ const playerRelY = 0.9;
 const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
-    0.05, 0.05,
-    "green");
+    0.05,
+    "blue", gctx);
+
+player1.image.onload = () => {
+    renderInitialScreen();
+};
 
 // Render initial screen with starfield and player
 function renderInitialScreen() {
@@ -170,7 +174,7 @@ function game() {
                 wavenumber++;
                 console.log("enemy wave:", wavenumber);
 
-                [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx, maxGridSize);
+                [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx);
                 enemies.push(...newEnemies);
                 // Re-enable shooting after new wave spawns
                 player1.shootingEnabled = true;
