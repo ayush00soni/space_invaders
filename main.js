@@ -70,6 +70,25 @@ function resizeCanvas() {
     gamecanvas.height = Math.min(window.innerHeight, window.innerWidth);
     gamecanvas.width = gamecanvas.height;
     starfield.resize(gamecanvas.width, gamecanvas.height);
+    if (!isGameRunning) {
+        renderInitialScreen();
+    }
+}
+
+// Main Player
+const playerRelX = 0.5;
+const playerRelY = 0.9;
+const player1 = new Player(
+    playerRelX, playerRelY,
+    0.7, 0.6,
+    0.05, 0.05,
+    "green");
+
+// Render initial screen with starfield and player
+function renderInitialScreen() {
+    gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
+    starfield.draw(gctx);
+    player1.draw(gctx);
 }
 
 resizeCanvas();
@@ -84,14 +103,6 @@ function game() {
     let gameOver = false; // For game over state
     let playerWon = false; // For win state
 
-    // Main Player
-    const playerRelX = 0.5;
-    const playerRelY = 0.9;
-    const player1 = new Player(
-        playerRelX, playerRelY,
-        0.7, 0.6,
-        0.05, 0.05,
-        "green");
 
     // Bullets Array
     const bullets = [];
@@ -263,8 +274,6 @@ function game() {
         // Draw starfield background
         starfield.draw(gctx);
 
-        if (paused) return;
-
         // Draw Deadline
         gctx.strokeStyle = "red";
         gctx.lineWidth = 2;
@@ -293,7 +302,6 @@ function game() {
 
         // Game Over / Win Screen
         if (gameOver || playerWon) {
-            gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
             finalScoreDisplay.textContent = `Final Score: ${score}`;
             gameOverWinScreen.classList.remove("hidden");
             hud.classList.add("hidden");
