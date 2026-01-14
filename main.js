@@ -1,6 +1,7 @@
 import { Player } from "./modules/player.js";
 import { collisionDetected } from "./modules/collision.js";
 import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
+import { StarField } from "./modules/background.js";
 
 // UI Setup
 const hud = document.getElementById("hud");
@@ -23,6 +24,9 @@ const restartButton = document.getElementById("restart-button");
 const resumeButton = document.getElementById("resume-button");
 const pauseScoreDisplay = document.getElementById("pause-score-display");
 const pauseLivesDisplay = document.getElementById("pause-lives-display");
+
+// Background
+const starfield = new StarField(5); // 5 stars per 100x100 pixels
 
 // Game Canvas Setup
 /** @type {HTMLCanvasElement} */
@@ -65,6 +69,7 @@ window.addEventListener("keyup", (e) => {
 function resizeCanvas() {
     gamecanvas.height = Math.min(window.innerHeight, window.innerWidth);
     gamecanvas.width = gamecanvas.height;
+    starfield.resize(gamecanvas.width, gamecanvas.height);
 }
 
 resizeCanvas();
@@ -254,6 +259,9 @@ function game() {
     function draw() {
         // Clear canvas
         gctx.clearRect(0, 0, gamecanvas.width, gamecanvas.height);
+
+        // Draw starfield background
+        starfield.draw(gctx);
 
         if (paused) return;
 
