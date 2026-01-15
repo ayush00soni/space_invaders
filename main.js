@@ -353,17 +353,20 @@ function game() {
 
         // Game Over / Win Screen
         if (gameOver || playerWon) {
-            finalScoreDisplay.textContent = `Final Score: ${score}`;
-            gameOverWinScreen.classList.remove("hidden");
-            hud.classList.add("hidden");
-            isGameRunning = false;
-            if (gameOver) {
-                gameOverTitle.classList.remove("hidden");
-                winTitle.classList.add("hidden");
-            } else if (playerWon) {
-                gameOverTitle.classList.add("hidden");
-                winTitle.classList.remove("hidden");
-            }
+            // Delay showing game over screen to allow last frame to render
+            setTimeout(() => {
+                finalScoreDisplay.textContent = `Final Score: ${score}`;
+                gameOverWinScreen.classList.remove("hidden");
+                hud.classList.add("hidden");
+                isGameRunning = false;
+                if (gameOver) {
+                    gameOverTitle.classList.remove("hidden");
+                    winTitle.classList.add("hidden");
+                } else if (playerWon) {
+                    gameOverTitle.classList.add("hidden");
+                    winTitle.classList.remove("hidden");
+                }
+            }, 1000);
         }
     }
 }
