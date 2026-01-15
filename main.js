@@ -2,6 +2,7 @@ import { Player } from "./modules/player.js";
 import { collisionDetected } from "./modules/collision.js";
 import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 import { StarField } from "./modules/background.js";
+import { Particle } from "./modules/particle.js";
 
 // UI Setup
 const hud = document.getElementById("hud");
@@ -122,6 +123,9 @@ function game() {
     const enemyWaveDelay = 2; // Seconds between waves
     let enemyWaveTimer = 0;
 
+    // Particle effects array
+    const particles = [];
+
     let lasttime = 0; // For delta time calculation
     // Game Loop
     /**
@@ -200,6 +204,19 @@ function game() {
                         lives--;
                         player1.hit();
                         console.log("Player hit by enemy");
+                        // Create particle effect
+                        const particleCount = 50;
+                        const particleSpeed = 100;
+                        for (let i = 0; i < particleCount; i++) {
+                            const particle = new Particle(
+                                player1.relX,
+                                player1.relY,
+                                player1.color,
+                                0.5,
+                                particleSpeed * (1 + Math.random())
+                            );
+                            particles.push(particle);
+                        }
                         break;
                     }
                 }
@@ -236,6 +253,19 @@ function game() {
                     bullet.active = false;
                     enemy.active = false;
                     score += 10;
+                    // Create particle effect
+                    const particleCount = 50;
+                    const particleSpeed = 100;
+                    for (let i = 0; i < particleCount; i++) {
+                        const particle = new Particle(
+                            enemy.relX,
+                            enemy.relY,
+                            enemy.color,
+                            0.5,
+                            particleSpeed * (1 + Math.random())
+                        );
+                        particles.push(particle);
+                    }
                     break;
                 }
             }
@@ -268,6 +298,18 @@ function game() {
             gameOver = true;
             console.log("Game Over: No lives remaining");
         }
+
+        // Update particles
+        particles.forEach((particle) => {
+            particle.update(deltatime, gctx);
+        });
+
+        // Remove dead particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            if (particles[i].life <= 0) {
+                particles.splice(i, 1);
+            }
+        }
     }
 
     // Draw function
@@ -297,6 +339,11 @@ function game() {
         // Draw enemies
         enemies.forEach((enemy) => {
             enemy.draw(gctx);
+        });
+
+        // Draw particles
+        particles.forEach((particle) => {
+            particle.draw(gctx);
         });
 
         // Score and Lives HUD
