@@ -83,7 +83,7 @@ const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
     0.05,
-    "blue", gctx);
+    "green", gctx);
 
 player1.image.onload = () => {
     renderInitialScreen();
