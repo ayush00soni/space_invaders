@@ -53,13 +53,14 @@ const input = {
     "KeyW": false,
     "KeyA": false,
     "KeyS": false,
-    "KeyD": false
+    "KeyD": false,
+    "Escape": false
 };
 
 window.addEventListener("keydown", (e) => {
     if (["ArrowUp", "ArrowDown", "ArrowLeft",
         "ArrowRight", "Space", "KeyW",
-        "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+        "KeyA", "KeyS", "KeyD", "Escape"].includes(e.code)) {
         e.preventDefault();
 
         input[e.code] = true;
@@ -162,6 +163,12 @@ function game() {
     function update(deltatime) {
         // Skip updates if game over
         if (!isGameRunning) return;
+
+        // Pause when escape is pressed
+        if (input["Escape"]) {
+            pauseButton.click();
+            input["Escape"] = false; // Prevent multiple toggles
+        }
 
         // Pause functionality
         if (paused) return;
