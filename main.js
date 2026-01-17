@@ -3,6 +3,7 @@ import { collisionDetected } from "./modules/collision.js";
 import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 import { StarField } from "./modules/background.js";
 import { Particle } from "./modules/particle.js";
+import { SoundManager } from "./modules/soundManager.js";
 
 // UI Setup
 const hud = document.getElementById("hud");
@@ -28,6 +29,9 @@ const pauseLivesDisplay = document.getElementById("pause-lives-display");
 
 // Background
 const starfield = new StarField(5); // 5 stars per 100x100 pixels
+
+// Sound Manager
+const soundManager = new SoundManager();
 
 // Game Canvas Setup
 /** @type {HTMLCanvasElement} */
@@ -75,6 +79,8 @@ function resizeCanvas() {
         renderInitialScreen();
     }
 }
+let lives = 3; // Player lives
+let score = 0; // Player score
 
 // Main Player
 const playerRelX = 0.5;
@@ -83,7 +89,7 @@ const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
     0.05,
-    "green", gctx);
+    "green", lives, gctx);
 
 player1.image.onload = () => {
     renderInitialScreen();
@@ -99,11 +105,10 @@ function renderInitialScreen() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-let lives = 3; // Player lives
-let score = 0; // Player score
 
 function game() {
     isGameRunning = true;
+    soundManager.playSound("startGame");
 
     let gameOver = false; // For game over state
     let playerWon = false; // For win state
@@ -116,10 +121,6 @@ function game() {
     const enemies = [];
     const enemyDeadLineY = playerRelY - player1.relHeight / 2 - 0.05; // Deadline above player
     let wavenumber = 0;
-    const maxGridSize = {
-        rows: 8,
-        columns: 10
-    };
     const enemyWaveDelay = 2; // Seconds between waves
     let enemyWaveTimer = 0;
 
@@ -152,6 +153,8 @@ function game() {
     let newEnemies = [];
     let isMaxWave = false;
 
+    // Flag for game over and player won sound
+    let finalSoundPlayed = false;
     // Update function
     function update(deltatime) {
         // Skip updates if game over
@@ -160,7 +163,7 @@ function game() {
         // Pause functionality
         if (paused) return;
 
-        player1.update(deltatime, input, gctx);
+        player1.update(deltatime, input, soundManager, gctx);
 
         if (enemies.length === 0) {
             enemyWaveTimer += deltatime;
@@ -178,6 +181,7 @@ function game() {
                 wavenumber++;
                 console.log("enemy wave:", wavenumber);
 
+                if (wavenumber > 1) soundManager.playSound("newWave");
                 [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx);
                 enemies.push(...newEnemies);
                 // Re-enable shooting after new wave spawns
@@ -186,10 +190,9 @@ function game() {
         }
 
         if (player1.isAlive) {
-
             // Handle shooting
             if (input["Space"]) {
-                const bullet = player1.shoot();
+                const bullet = player1.shoot(soundManager);
                 if (bullet) {
                     bullets.push(bullet);
                 }
@@ -202,6 +205,7 @@ function game() {
                     if (!enemy.active) continue;
                     if (collisionDetected(player1, enemy, gctx)) {
                         lives--;
+                        soundManager.playSound("hit");
                         player1.hit();
                         console.log("Player hit by enemy");
                         // Create particle effect
@@ -253,6 +257,7 @@ function game() {
                     bullet.active = false;
                     enemy.active = false;
                     score += 10;
+                    soundManager.playSound("explosion");
                     // Create particle effect
                     const particleCount = 50;
                     const particleSpeed = 100;
@@ -352,7 +357,19 @@ function game() {
         livesDisplay.textContent = `Lives: ${lives}`;
 
         // Game Over / Win Screen
-        if (gameOver || playerWon) {
+        if ((gameOver || playerWon) && !finalSoundPlayed) {
+            finalSoundPlayed = true;
+            const soundDelay = (lives === 0) ? soundManager.getDuration("hit") : 0;
+            if (soundDelay > 0) {
+                console.log(`Delaying final sound by ${soundDelay} seconds to allow hit sound to finish.`);
+            }
+            setTimeout(() => {
+                if (gameOver) {
+                    soundManager.playSound("gameOver");
+                } else if (playerWon) {
+                    soundManager.playSound("playerWin");
+                }
+            }, soundDelay * 1000);
             // Delay showing game over screen to allow last frame to render
             setTimeout(() => {
                 finalScoreDisplay.textContent = `Final Score: ${score}`;
@@ -367,6 +384,7 @@ function game() {
                     winTitle.classList.remove("hidden");
                 }
             }, 1000);
+
         }
     }
 }

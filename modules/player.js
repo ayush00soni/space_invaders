@@ -10,7 +10,7 @@ export class Player {
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, gctx) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, lives, gctx) {
         this.relX = relX;
         this.relY = relY;
         this.relXi = relX; // Initial positions for respawn
@@ -31,6 +31,8 @@ export class Player {
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
         this.gctx = gctx;
+        this.lives = lives;
+        this.maxLives = lives;
     }
     /**
      * @param {CanvasRenderingContext2D} gctx
@@ -109,8 +111,9 @@ export class Player {
 
     }
 
-    shoot() {
+    shoot(soundManager) {
         if (this.shootCooldown > 0 || !this.shootingEnabled) return null;
+        soundManager.playSound("shoot");
         this.shootCooldown = 0.5;
         const bullet = new Bullet(
             this.relX, this.relY,
@@ -126,7 +129,7 @@ export class Player {
      * @param {object} input
      * @param {CanvasRenderingContext2D} gctx
      */
-    update(deltatime, input, gctx) { // Player is alive
+    update(deltatime, input, soundManager, gctx) { // Player is alive
         if (this.isAlive) {
             this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
             // Handle input for acceleration
@@ -139,6 +142,9 @@ export class Player {
             if (this.respawnTimer > 0) {
                 this.respawnTimer -= deltatime;
             } else {
+                this.lives--;
+
+                if (this.lives < this.maxLives) soundManager.playSound("respawn");
                 this.respawn();
                 console.log("Player respawned");
             }
