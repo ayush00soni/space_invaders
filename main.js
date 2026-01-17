@@ -79,7 +79,8 @@ function resizeCanvas() {
         renderInitialScreen();
     }
 }
-let lives = 3; // Player lives
+const maxLives = 3; // Maximum player lives
+let lives = maxLives; // Player lives
 let score = 0; // Player score
 
 // Main Player
@@ -89,7 +90,7 @@ const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
     0.05,
-    "green", lives, gctx);
+    "green", gctx);
 
 player1.image.onload = () => {
     renderInitialScreen();
@@ -199,31 +200,38 @@ function game() {
             }
 
             // Check for player-enemy collisions
-            if (player1.isAlive) {
-                for (const enemy of enemies) {
-                    // Ignore inactive enemies
-                    if (!enemy.active) continue;
-                    if (collisionDetected(player1, enemy, gctx)) {
-                        lives--;
-                        soundManager.playSound("hit");
-                        player1.hit();
-                        console.log("Player hit by enemy");
-                        // Create particle effect
-                        const particleCount = 50;
-                        const particleSpeed = 100;
-                        for (let i = 0; i < particleCount; i++) {
-                            const particle = new Particle(
-                                player1.relX,
-                                player1.relY,
-                                player1.color,
-                                0.5,
-                                particleSpeed * (1 + Math.random())
-                            );
-                            particles.push(particle);
-                        }
-                        break;
+            for (const enemy of enemies) {
+                // Ignore inactive enemies
+                if (!enemy.active) continue;
+                if (collisionDetected(player1, enemy, gctx)) {
+                    lives--;
+                    soundManager.playSound("hit");
+                    player1.hit();
+                    console.log("Player hit by enemy");
+                    // Create particle effect
+                    const particleCount = 50;
+                    const particleSpeed = 100;
+                    for (let i = 0; i < particleCount; i++) {
+                        const particle = new Particle(
+                            player1.relX,
+                            player1.relY,
+                            player1.color,
+                            0.5,
+                            particleSpeed * (1 + Math.random())
+                        );
+                        particles.push(particle);
                     }
+                    break;
                 }
+            }
+        } else if (lives > 0) { // Player is dead
+            // Handle Player Respawn logic
+            if (player1.respawnTimer > 0) {
+                player1.respawnTimer -= deltatime;
+            } else {
+                if (lives < maxLives) soundManager.playSound("respawn");
+                player1.respawn();
+                console.log("Player respawned");
             }
         }
 
@@ -383,7 +391,7 @@ function game() {
                     gameOverTitle.classList.add("hidden");
                     winTitle.classList.remove("hidden");
                 }
-            }, 1000);
+            }, 1000 + (soundDelay * 1000));
 
         }
     }

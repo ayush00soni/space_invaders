@@ -10,7 +10,7 @@ export class Player {
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, lives, gctx) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, gctx) {
         this.relX = relX;
         this.relY = relY;
         this.relXi = relX; // Initial positions for respawn
@@ -31,8 +31,6 @@ export class Player {
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
         this.gctx = gctx;
-        this.lives = lives;
-        this.maxLives = lives;
     }
     /**
      * @param {CanvasRenderingContext2D} gctx
@@ -137,17 +135,6 @@ export class Player {
 
             // Handle input for movement
             this.move(deltatime, gctx);
-        } else { // Player is dead#
-            // Respawn logic
-            if (this.respawnTimer > 0) {
-                this.respawnTimer -= deltatime;
-            } else {
-                this.lives--;
-
-                if (this.lives < this.maxLives) soundManager.playSound("respawn");
-                this.respawn();
-                console.log("Player respawned");
-            }
         }
     }
 
