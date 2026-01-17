@@ -110,6 +110,8 @@ window.addEventListener("resize", resizeCanvas);
 function game() {
     isGameRunning = true;
     soundManager.playSound("startGame");
+    // Enable player shooting
+    player1.shootingEnabled = true;
 
     let gameOver = false; // For game over state
     let playerWon = false; // For win state
@@ -164,7 +166,8 @@ function game() {
         // Pause functionality
         if (paused) return;
 
-        player1.update(deltatime, input, soundManager, gctx);
+        if (!(gameOver || playerWon))
+            player1.update(deltatime, input, soundManager, gctx);
 
         if (enemies.length === 0) {
             enemyWaveTimer += deltatime;
@@ -229,7 +232,7 @@ function game() {
             if (player1.respawnTimer > 0) {
                 player1.respawnTimer -= deltatime;
             } else {
-                if (lives < maxLives) soundManager.playSound("respawn");
+                soundManager.playSound("respawn");
                 player1.respawn();
                 console.log("Player respawned");
             }
@@ -244,7 +247,8 @@ function game() {
 
         let hitEdge = false;
         enemies.forEach((enemy) => {
-            enemy.update(deltatime);
+            if (!(gameOver || playerWon))
+                enemy.update(deltatime);
         });
         enemies.forEach((enemy) => {
             if (enemy.isOnEdge(deltatime, gctx)) {
@@ -261,7 +265,7 @@ function game() {
         // Check for bullet-enemy collisions
         for (const enemy of enemies) {
             for (const bullet of bullets) {
-                if (collisionDetected(bullet, enemy, gctx)) {
+                if (bullet.active && enemy.active && collisionDetected(bullet, enemy, gctx)) {
                     bullet.active = false;
                     enemy.active = false;
                     score += 10;
@@ -366,6 +370,12 @@ function game() {
 
         // Game Over / Win Screen
         if ((gameOver || playerWon) && !finalSoundPlayed) {
+            // Clear bullets
+            bullets.length = 0;
+
+            // Disable shooting
+            player1.shootingEnabled = false;
+
             finalSoundPlayed = true;
             const soundDelay = (lives === 0) ? soundManager.getDuration("hit") : 0;
             if (soundDelay > 0) {
