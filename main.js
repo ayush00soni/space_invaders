@@ -87,11 +87,12 @@ let score = 0; // Player score
 // Main Player
 const playerRelX = 0.5;
 const playerRelY = 0.9;
+const playerHitSound = "explosion";
 const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
     0.05,
-    "green", (soundManager.getDuration("hit") + 2), gctx);
+    "green", (soundManager.getDuration(playerHitSound) + 2), gctx);
 
 player1.image.onload = () => {
     renderInitialScreen();
@@ -130,6 +131,9 @@ function game() {
 
     // Particle effects array
     const particles = [];
+    const explosionParticleCount = 50;
+    const explosionParticleSpeed = 50;
+    const explosionParticleDecay = 0.8;
 
     let lasttime = 0; // For delta time calculation
     // Game Loop
@@ -215,19 +219,17 @@ function game() {
                 if (!enemy.active) continue;
                 if (collisionDetected(player1, enemy, gctx)) {
                     lives--;
-                    soundManager.playSound("hit");
+                    soundManager.playSound(playerHitSound);
                     player1.hit();
                     console.log("Player hit by enemy");
                     // Create particle effect
-                    const particleCount = 50;
-                    const particleSpeed = 10;
-                    for (let i = 0; i < particleCount; i++) {
+                    for (let i = 0; i < explosionParticleCount; i++) {
                         const particle = new Particle(
                             player1.relX,
                             player1.relY,
                             player1.color,
-                            0.5,
-                            particleSpeed * (1 + Math.random()), 1, gctx
+                            explosionParticleDecay,
+                            explosionParticleSpeed * (1 + Math.random()), 1, gctx
                         );
                         particles.push(particle);
                     }
@@ -238,7 +240,7 @@ function game() {
             // Handle Player Respawn logic
             if (player1.respawnTimer > 0) {
 
-                if (player1.respawnTimer < player1.respawnDelay - soundManager.getDuration("hit")) { // Start implosion when hit sound ends
+                if (player1.respawnTimer < player1.respawnDelay - soundManager.getDuration(playerHitSound)) { // Start implosion when hit sound ends
                     // Generate implosion particles during respawn delay
                     const implosionRadius = 0.02;
                     const particleDecay = 1 / player1.respawnTimer;
@@ -292,15 +294,13 @@ function game() {
                     score += 10;
                     soundManager.playSound("explosion");
                     // Create particle effect
-                    const particleCount = 50;
-                    const particleSpeed = 10;
-                    for (let i = 0; i < particleCount; i++) {
+                    for (let i = 0; i < explosionParticleCount; i++) {
                         const particle = new Particle(
                             enemy.relX,
                             enemy.relY,
                             enemy.color,
-                            0.5,
-                            particleSpeed * (1 + Math.random()), 1, gctx
+                            explosionParticleDecay,
+                            explosionParticleSpeed * (1 + Math.random()), 1, gctx
                         );
                         particles.push(particle);
                     }
@@ -398,7 +398,7 @@ function game() {
             player1.shootingEnabled = false;
 
             finalSoundPlayed = true;
-            const soundDelay = (lives === 0) ? soundManager.getDuration("hit") : 0;
+            const soundDelay = (lives === 0) ? soundManager.getDuration(playerHitSound) : 0;
             if (soundDelay > 0) {
                 console.log(`Delaying final sound by ${soundDelay} seconds to allow hit sound to finish.`);
             }

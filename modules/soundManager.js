@@ -5,7 +5,6 @@ export class SoundManager {
             "shoot": new Audio('assets/shoot.ogg'),
             "gameOver": new Audio('assets/game_over.ogg'),
             "startGame": new Audio('assets/start_game.ogg'),
-            "hit": new Audio('assets/hit.ogg'),
             "playerWon": new Audio('assets/player_won.ogg'),
             "respawn": new Audio('assets/respawn.ogg'),
             "newWave": new Audio('assets/new_wave.ogg')
