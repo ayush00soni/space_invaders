@@ -91,7 +91,7 @@ const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
     0.05,
-    "green", gctx);
+    "green", (soundManager.getDuration("hit") + 2), gctx);
 
 player1.image.onload = () => {
     renderInitialScreen();
@@ -220,14 +220,14 @@ function game() {
                     console.log("Player hit by enemy");
                     // Create particle effect
                     const particleCount = 50;
-                    const particleSpeed = 100;
+                    const particleSpeed = 10;
                     for (let i = 0; i < particleCount; i++) {
                         const particle = new Particle(
                             player1.relX,
                             player1.relY,
                             player1.color,
                             0.5,
-                            particleSpeed * (1 + Math.random())
+                            particleSpeed * (1 + Math.random()), 1, gctx
                         );
                         particles.push(particle);
                     }
@@ -237,6 +237,20 @@ function game() {
         } else if (lives > 0) { // Player is dead
             // Handle Player Respawn logic
             if (player1.respawnTimer > 0) {
+
+                if (player1.respawnTimer < player1.respawnDelay - soundManager.getDuration("hit")) { // Start implosion when hit sound ends
+                    // Generate implosion particles during respawn delay
+                    const implosionRadius = 0.02;
+                    const particleDecay = 1 / player1.respawnTimer;
+                    const particleSpeed = implosionRadius * particleDecay * Math.hypot(gctx.canvas.width, gctx.canvas.height);
+                    particles.push(new Particle(
+                        player1.relXi,
+                        player1.relYi,
+                        player1.color,
+                        particleDecay,
+                        particleSpeed, 0, gctx
+                    ));
+                }
                 player1.respawnTimer -= deltatime;
             } else {
                 soundManager.playSound("respawn");
@@ -279,14 +293,14 @@ function game() {
                     soundManager.playSound("explosion");
                     // Create particle effect
                     const particleCount = 50;
-                    const particleSpeed = 100;
+                    const particleSpeed = 10;
                     for (let i = 0; i < particleCount; i++) {
                         const particle = new Particle(
                             enemy.relX,
                             enemy.relY,
                             enemy.color,
                             0.5,
-                            particleSpeed * (1 + Math.random())
+                            particleSpeed * (1 + Math.random()), 1, gctx
                         );
                         particles.push(particle);
                     }
@@ -431,6 +445,7 @@ restartButton.addEventListener("click", () => {
     // Reset game state
     score = 0;
     lives = 3;
+    player1.reset();
     gameOverWinScreen.classList.add("hidden");
     hud.classList.remove("hidden");
     // Clear input states

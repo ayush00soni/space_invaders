@@ -10,7 +10,7 @@ export class Player {
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, gctx) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, respawnDelay, gctx) {
         this.relX = relX;
         this.relY = relY;
         this.relXi = relX; // Initial positions for respawn
@@ -22,7 +22,7 @@ export class Player {
         this.color = color;
         this.shootCooldown = 0;
         this.isAlive = true;
-        this.respawnDelay = 1;
+        this.respawnDelay = respawnDelay;
         this.respawnTimer = 0;
         this.decFactor = 6; // Deceleration factor
         this.shootingEnabled = true;
@@ -146,6 +146,15 @@ export class Player {
     }
 
     respawn() {
+        this.relX = this.relXi;
+        this.relY = this.relYi;
+        this.vx = 0;
+        this.vy = 0;
+        this.isAlive = true;
+        this.respawnTimer = 0;
+    }
+
+    reset() {
         this.relX = this.relXi;
         this.relY = this.relYi;
         this.vx = 0;
