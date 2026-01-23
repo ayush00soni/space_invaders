@@ -187,14 +187,12 @@ function game() {
 
             if (isMaxWave) {
                 playerWon = true;
-                console.log("Player Won: All waves cleared!");
             } else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
                 // Delete all existing bullets
                 bullets.length = 0;
 
                 enemyWaveTimer = 0;
                 wavenumber++;
-                console.log("enemy wave:", wavenumber);
 
                 if (wavenumber > 1) soundManager.playSound("newWave");
                 [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx);
@@ -221,7 +219,6 @@ function game() {
                     lives--;
                     soundManager.playSound(playerHitSound);
                     player1.hit();
-                    console.log("Player hit by enemy");
                     // Create particle effect
                     for (let i = 0; i < explosionParticleCount; i++) {
                         const particle = new Particle(
@@ -257,7 +254,6 @@ function game() {
             } else {
                 soundManager.playSound("respawn");
                 player1.respawn();
-                console.log("Player respawned");
             }
         }
 
@@ -327,14 +323,12 @@ function game() {
         for (const enemy of enemies) {
             if (enemy.relY + enemy.relHeight / 2 >= enemyDeadLineY) {
                 gameOver = true;
-                console.log("Game Over: Enemy reached deadline.");
                 break;
             }
         }
 
         if (lives <= 0) {
             gameOver = true;
-            console.log("Game Over: No lives remaining");
         }
 
         // Update particles
@@ -400,7 +394,6 @@ function game() {
             finalSoundPlayed = true;
             const soundDelay = (lives === 0) ? soundManager.getDuration(playerHitSound) : 0;
             if (soundDelay > 0) {
-                console.log(`Delaying final sound by ${soundDelay} seconds to allow hit sound to finish.`);
             }
             setTimeout(() => {
                 if (gameOver) {
