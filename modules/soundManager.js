@@ -1,13 +1,13 @@
 export class SoundManager {
     constructor() {
         this.sounds = {
-            "explosion": new Audio('assets/explosion.ogg'),
-            "shoot": new Audio('assets/shoot.ogg'),
-            "gameOver": new Audio('assets/game_over.ogg'),
-            "startGame": new Audio('assets/start_game.ogg'),
-            "playerWon": new Audio('assets/player_won.ogg'),
-            "respawn": new Audio('assets/respawn.ogg'),
-            "newWave": new Audio('assets/new_wave.ogg')
+            "explosion": new Audio('assets/audio/explosion.ogg'),
+            "shoot": new Audio('assets/audio/shoot.ogg'),
+            "gameOver": new Audio('assets/audio/game_over.ogg'),
+            "startGame": new Audio('assets/audio/start_game.ogg'),
+            "playerWon": new Audio('assets/audio/player_won.ogg'),
+            "respawn": new Audio('assets/audio/respawn.ogg'),
+            "newWave": new Audio('assets/audio/new_wave.ogg')
         };
     }
 

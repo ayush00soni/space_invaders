@@ -1,15 +1,15 @@
 export class Bullet {
-    constructor(relX, relY, relSpeed, relWidth, color, gctx) {
+    constructor(relX, relY, relSpeed, relWidth, color, imageSrc, rotation = 0) {
         this.relX = relX;
         this.relY = relY;
         this.relSpeed = relSpeed;
         this.color = color;
         this.active = true;
         this.image = new Image();
-        this.image.src = "assets/laser.png";
+        this.image.src = imageSrc;
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
-        this.gctx = gctx;
+        this.rotation = rotation;
     }
 
     /**

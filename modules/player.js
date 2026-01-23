@@ -27,7 +27,7 @@ export class Player {
         this.decFactor = 6; // Deceleration factor
         this.shootingEnabled = true;
         this.image = new Image();
-        this.image.src = "assets/player.png";
+        this.image.src = "assets/img/player.png";
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
         this.gctx = gctx;
@@ -117,7 +117,8 @@ export class Player {
             this.relX, this.relY,
             0.8,
             0.005,
-            "blue", this.gctx
+            "blue",
+            "assets/img/green_laser.png"
         );
         return bullet;
     }

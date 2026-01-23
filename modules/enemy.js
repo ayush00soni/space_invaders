@@ -10,7 +10,7 @@ export class Enemy {
         this.gridPosition = gridPosition;
         this.active = true;
         this.image = new Image();
-        this.image.src = "assets/enemy.png";
+        this.image.src = "assets/img/enemy.png";
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
     }
