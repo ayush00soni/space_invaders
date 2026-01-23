@@ -92,7 +92,7 @@ const player1 = new Player(
     playerRelX, playerRelY,
     0.7, 0.6,
     0.05,
-    "green", (soundManager.getDuration(playerHitSound) + 2), gctx);
+    "green", (soundManager.getDuration(playerHitSound) + 2));
 
 player1.image.onload = () => {
     renderInitialScreen();
@@ -186,7 +186,7 @@ function game() {
         enemyShootTimer += deltatime;
 
         if (!(gameOver || playerWon))
-            player1.update(deltatime, input, soundManager, gctx);
+            player1.update(deltatime, input);
 
         if (enemies.length === 0) {
             enemyWaveTimer += deltatime;
@@ -223,7 +223,7 @@ function game() {
             for (const enemy of enemies) {
                 // Ignore inactive enemies
                 if (!enemy.active) continue;
-                if (collisionDetected(player1, enemy, gctx)) {
+                if (collisionDetected(player1, enemy, gctx) && player1.invincibilityTimer <= 0) {
                     lives--;
                     const newParticles = player1.hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx);
                     particles.push(...newParticles);
@@ -236,7 +236,7 @@ function game() {
 
                 if (player1.respawnTimer < player1.respawnDelay - soundManager.getDuration(playerHitSound)) { // Start implosion when hit sound ends
                     // Generate implosion particles during respawn delay
-                    const implosionRadius = 0.02;
+                    const implosionRadius = Math.max(player1.relWidth, player1.relHeight);
                     const particleDecay = 1 / player1.respawnTimer;
                     const particleSpeed = implosionRadius * particleDecay * Math.hypot(gctx.canvas.width, gctx.canvas.height);
                     particles.push(new Particle(
@@ -285,7 +285,7 @@ function game() {
         }
 
         // Enemy Shooting
-        if (enemyShootTimer >= enemyShootInterval) {
+        if (enemyShootTimer >= enemyShootInterval && !(gameOver || playerWon)) {
             enemyShootTimer = 0;
             // Select a random active enemy to shoot
             const activeEnemies = enemies.filter(enemy => enemy.active);
@@ -323,7 +323,7 @@ function game() {
         // Check for enemyBullet-player collisions
         if (player1.isAlive) {
             for (const bullet of enemyBullets) {
-                if (bullet.active && collisionDetected(bullet, player1, gctx)) {
+                if (bullet.active && collisionDetected(bullet, player1, gctx) && player1.invincibilityTimer <= 0) {
                     bullet.active = false;
                     lives--;
                     soundManager.playSound(playerHitSound);
@@ -418,6 +418,7 @@ function game() {
         if ((gameOver || playerWon) && !finalSoundPlayed) {
             // Clear bullets
             playerBullets.length = 0;
+            enemyBullets.length = 0;
 
             // Disable shooting
             player1.shootingEnabled = false;

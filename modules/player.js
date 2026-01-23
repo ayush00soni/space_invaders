@@ -11,7 +11,7 @@ export class Player {
      * @param {number} height
      * @param {string} color
      */
-    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, respawnDelay, gctx) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, respawnDelay) {
         this.relX = relX;
         this.relY = relY;
         this.relXi = relX; // Initial positions for respawn
@@ -31,7 +31,9 @@ export class Player {
         this.image.src = "assets/img/player.png";
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
-        this.gctx = gctx;
+
+        this.invincibilityDuration = 3; // seconds
+        this.invincibilityTimer = 0;
     }
     /**
      * @param {CanvasRenderingContext2D} gctx
@@ -48,6 +50,19 @@ export class Player {
         } else {
             gctx.fillStyle = this.color;
             gctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+
+        // draw invincibility overlay
+        if (this.invincibilityTimer > 0) {
+            gctx.save();
+            gctx.beginPath();
+            gctx.arc(this.x + this.width / 2, this.y + this.height / 2, Math.max(this.width, this.height), 0, 2 * Math.PI);
+            gctx.strokeStyle = `rgba(0, 255, 0, ${(this.invincibilityTimer / this.invincibilityDuration)})`;
+            gctx.lineWidth = 3;
+            gctx.shadowBlur = 20;
+            gctx.shadowColor = 'green';
+            gctx.stroke();
+            gctx.restore();
         }
 
     }
@@ -129,9 +144,11 @@ export class Player {
      * @param {object} input
      * @param {CanvasRenderingContext2D} gctx
      */
-    update(deltatime, input, soundManager, gctx) { // Player is alive
+    update(deltatime, input) { // Player is alive
         if (this.isAlive) {
             this.shootCooldown = Math.max(this.shootCooldown - deltatime, 0);
+            this.invincibilityTimer = Math.max(this.invincibilityTimer - deltatime, 0);
+
             // Handle input for acceleration
             this.accelerate(deltatime, input);
 
@@ -168,6 +185,7 @@ export class Player {
         this.vy = 0;
         this.isAlive = true;
         this.respawnTimer = 0;
+        this.invincibilityTimer = this.invincibilityDuration;
     }
 
     reset() {
