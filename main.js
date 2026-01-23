@@ -481,6 +481,7 @@ restartButton.addEventListener("click", () => {
 });
 
 pauseButton.addEventListener("click", () => {
+    soundManager.playSound("pause");
     paused = true;
     pauseScoreDisplay.textContent = `Score: ${score}`;
     pauseLivesDisplay.textContent = `Lives: ${lives}`;
@@ -489,6 +490,7 @@ pauseButton.addEventListener("click", () => {
 });
 
 resumeButton.addEventListener("click", () => {
+    soundManager.playSound("pause");
     paused = false;
     document.getElementById("pause-screen").classList.add("hidden");
     hud.classList.remove("hidden");

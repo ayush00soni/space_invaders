@@ -8,7 +8,8 @@ export class SoundManager {
             "startGame": new Audio('assets/audio/start_game.ogg'),
             "playerWon": new Audio('assets/audio/player_won.ogg'),
             "respawn": new Audio('assets/audio/respawn.ogg'),
-            "newWave": new Audio('assets/audio/new_wave.ogg')
+            "newWave": new Audio('assets/audio/new_wave.ogg'),
+            "pause": new Audio('assets/audio/pause.ogg')
         };
     }
 
