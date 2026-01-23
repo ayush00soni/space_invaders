@@ -9,8 +9,8 @@ import { Enemy } from "./enemy.js";
 // TODO: Grid becomes assymetrical for odd number of columns; Fix that
 export function generateEnemyWave(wavenumber, gctx) {
     const maxGridSize = {
-        rows: 8,
-        columns: 10
+        rows: 7,
+        columns: 9
     };
 
     const initialGridSize = {
@@ -29,6 +29,7 @@ export function generateEnemyWave(wavenumber, gctx) {
     const enemyRelWidth = 0.05, enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
     const enemyDirection = 1;
+    const enemyRelSpeed = 0.3;
 
     function generateEnemy(i, j) {
         // Minimum distance from edge is made to be same as space between two enemies
@@ -36,7 +37,7 @@ export function generateEnemyWave(wavenumber, gctx) {
             (i * maxGridSize.columns) + j,
             (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
             i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
-            0.3, // RelSpeed
+            enemyRelSpeed, // RelSpeed
             enemyRelWidth,
             "gray",
             enemyRelSpacing,

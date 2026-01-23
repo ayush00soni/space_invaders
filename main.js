@@ -270,7 +270,7 @@ function game() {
                 enemy.update(deltatime);
         });
         enemies.forEach((enemy) => {
-            if (enemy.isOnEdge(deltatime, gctx)) {
+            if (enemy.isOnEdge(deltatime)) {
                 hitEdge = true;
             }
         });

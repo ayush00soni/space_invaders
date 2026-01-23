@@ -24,7 +24,7 @@ export class Enemy {
         this.dir *= -1;
     }
 
-    isOnEdge(deltatime, gctx) {
+    isOnEdge(deltatime) {
         // Minimum distance from edge is made to be same as space between two enemies
         const edgeSpace = this.spacing + this.relWidth / 2;
         return (this.relX + this.dir * this.relSpeed * deltatime < edgeSpace || this.relX + this.dir * this.relSpeed * deltatime > 1 - edgeSpace);

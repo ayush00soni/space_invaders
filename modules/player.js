@@ -112,7 +112,7 @@ export class Player {
     shoot(soundManager) {
         if (this.shootCooldown > 0 || !this.shootingEnabled) return null;
         soundManager.playSound("shoot");
-        this.shootCooldown = 0.5;
+        this.shootCooldown = 0.4;
         const bullet = new Bullet(
             this.relX, this.relY,
             0.8,
