@@ -41,8 +41,7 @@ export function generateEnemyWave(wavenumber, gctx) {
             "gray",
             enemyRelSpacing,
             enemyDirection,
-            0,
-            gctx
+            { row: i, column: j }
         );
     }
     // Using a mirror system to create symmetrical enemy waves

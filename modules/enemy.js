@@ -1,5 +1,5 @@
 export class Enemy {
-    constructor(id, relX, relY, relSpeed, relWidth, color, spacing, dir, column, gctx) {
+    constructor(id, relX, relY, relSpeed, relWidth, color, spacing, dir, gridPosition) {
         this.id = id;
         this.relX = relX;
         this.relY = relY;
@@ -7,13 +7,12 @@ export class Enemy {
         this.color = color;
         this.spacing = spacing;
         this.dir = dir;
-        this.column = column;
+        this.gridPosition = gridPosition;
         this.active = true;
         this.image = new Image();
         this.image.src = "assets/enemy.png";
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
-        this.gctx = gctx;
     }
 
     update(deltatime) {

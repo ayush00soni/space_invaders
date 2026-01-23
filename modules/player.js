@@ -64,7 +64,7 @@ export class Player {
     * @param {number} deltatime
     * @param {CanvasRenderingContext2D} gctx
     */
-    move(deltatime, gctx) {
+    move(deltatime) {
 
         this.relX += this.vx * deltatime;
         this.relY += this.vy * deltatime;
@@ -134,7 +134,7 @@ export class Player {
             this.accelerate(deltatime, input);
 
             // Handle input for movement
-            this.move(deltatime, gctx);
+            this.move(deltatime);
         }
     }
 
