@@ -1,4 +1,5 @@
 import { Bullet } from "./bullet.js";
+import { Particle } from "./particle.js";
 
 export class Player {
     /**
@@ -117,7 +118,7 @@ export class Player {
             this.relX, this.relY,
             0.8,
             0.005,
-            "blue",
+            "green",
             "assets/img/green_laser.png"
         );
         return bullet;
@@ -139,11 +140,25 @@ export class Player {
         }
     }
 
-    hit() {
+    hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx) {
+        soundManager.playSound(playerHitSound);
         this.isAlive = false;
         this.vx = 0;
         this.vy = 0;
         this.respawnTimer = this.respawnDelay;
+        const particles = [];
+        // Create particle effect
+        for (let i = 0; i < explosionParticleCount; i++) {
+            const particle = new Particle(
+                this.relX,
+                this.relY,
+                this.color,
+                explosionParticleDecay,
+                explosionParticleSpeed * (1 + Math.random()), 1, gctx
+            );
+            particles.push(particle);
+        }
+        return particles;
     }
 
     respawn() {

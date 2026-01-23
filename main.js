@@ -119,8 +119,13 @@ function game() {
     let playerWon = false; // For win state
 
 
-    // Bullets Array
-    const bullets = [];
+    // Player Bullets Array
+    const playerBullets = [];
+
+    // Enemy Bullet Array
+    const enemyBullets = [];
+    const enemyShootInterval = 2; // Seconds between enemy shots
+    let enemyShootTimer = 0;
 
     // Enemies Array
     const enemies = [];
@@ -177,6 +182,9 @@ function game() {
         // Pause functionality
         if (paused) return;
 
+        // Increase enemy shoot timer
+        enemyShootTimer += deltatime;
+
         if (!(gameOver || playerWon))
             player1.update(deltatime, input, soundManager, gctx);
 
@@ -189,7 +197,7 @@ function game() {
                 playerWon = true;
             } else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
                 // Delete all existing bullets
-                bullets.length = 0;
+                playerBullets.length = 0;
 
                 enemyWaveTimer = 0;
                 wavenumber++;
@@ -207,7 +215,7 @@ function game() {
             if (input["Space"]) {
                 const bullet = player1.shoot(soundManager);
                 if (bullet) {
-                    bullets.push(bullet);
+                    playerBullets.push(bullet);
                 }
             }
 
@@ -217,19 +225,8 @@ function game() {
                 if (!enemy.active) continue;
                 if (collisionDetected(player1, enemy, gctx)) {
                     lives--;
-                    soundManager.playSound(playerHitSound);
-                    player1.hit();
-                    // Create particle effect
-                    for (let i = 0; i < explosionParticleCount; i++) {
-                        const particle = new Particle(
-                            player1.relX,
-                            player1.relY,
-                            player1.color,
-                            explosionParticleDecay,
-                            explosionParticleSpeed * (1 + Math.random()), 1, gctx
-                        );
-                        particles.push(particle);
-                    }
+                    const newParticles = player1.hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx);
+                    particles.push(...newParticles);
                     break;
                 }
             }
@@ -257,10 +254,17 @@ function game() {
             }
         }
 
-        bullets.forEach((bullet, index) => {
+        playerBullets.forEach((bullet, index) => {
             bullet.update(deltatime);
             if (bullet.isOffScreen()) {
-                bullets.splice(index, 1);
+                playerBullets.splice(index, 1);
+            }
+        });
+
+        enemyBullets.forEach((bullet, index) => {
+            bullet.update(deltatime);
+            if (bullet.isOffScreen()) {
+                enemyBullets.splice(index, 1);
             }
         });
 
@@ -280,10 +284,21 @@ function game() {
             });
         }
 
+        // Enemy Shooting
+        if (enemyShootTimer >= enemyShootInterval) {
+            enemyShootTimer = 0;
+            // Select a random active enemy to shoot
+            const activeEnemies = enemies.filter(enemy => enemy.active);
+            if (activeEnemies.length > 0) {
+                const shootingEnemy = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
+                const enemyBullet = shootingEnemy.shoot(soundManager);
+                enemyBullets.push(enemyBullet);
+            }
+        }
 
-        // Check for bullet-enemy collisions
+        // Check for playerBullet-enemy collisions
         for (const enemy of enemies) {
-            for (const bullet of bullets) {
+            for (const bullet of playerBullets) {
                 if (bullet.active && enemy.active && collisionDetected(bullet, enemy, gctx)) {
                     bullet.active = false;
                     enemy.active = false;
@@ -305,10 +320,23 @@ function game() {
             }
         }
 
+        // Check for enemyBullet-player collisions
+        if (player1.isAlive) {
+            for (const bullet of enemyBullets) {
+                if (bullet.active && collisionDetected(bullet, player1, gctx)) {
+                    bullet.active = false;
+                    lives--;
+                    soundManager.playSound(playerHitSound);
+                    const newParticles = player1.hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx);
+                    particles.push(...newParticles);
+                }
+            }
+        }
+
         // Remove inactive bullets
-        for (let i = bullets.length - 1; i >= 0; i--) {
-            if (!bullets[i].active) {
-                bullets.splice(i, 1);
+        for (let i = playerBullets.length - 1; i >= 0; i--) {
+            if (!playerBullets[i].active) {
+                playerBullets.splice(i, 1);
             }
         }
 
@@ -361,7 +389,10 @@ function game() {
         gctx.stroke();
 
         // Draw bullets
-        bullets.forEach((bullet) => {
+        playerBullets.forEach((bullet) => {
+            bullet.draw(gctx);
+        });
+        enemyBullets.forEach((bullet) => {
             bullet.draw(gctx);
         });
 
@@ -386,7 +417,7 @@ function game() {
         // Game Over / Win Screen
         if ((gameOver || playerWon) && !finalSoundPlayed) {
             // Clear bullets
-            bullets.length = 0;
+            playerBullets.length = 0;
 
             // Disable shooting
             player1.shootingEnabled = false;

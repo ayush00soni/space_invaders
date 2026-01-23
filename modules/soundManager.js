@@ -3,6 +3,7 @@ export class SoundManager {
         this.sounds = {
             "explosion": new Audio('assets/audio/explosion.ogg'),
             "shoot": new Audio('assets/audio/shoot.ogg'),
+            "shoot2": new Audio('assets/audio/shoot2.ogg'),
             "gameOver": new Audio('assets/audio/game_over.ogg'),
             "startGame": new Audio('assets/audio/start_game.ogg'),
             "playerWon": new Audio('assets/audio/player_won.ogg'),

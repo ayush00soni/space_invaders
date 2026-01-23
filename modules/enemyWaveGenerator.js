@@ -29,7 +29,7 @@ export function generateEnemyWave(wavenumber, gctx) {
     const enemyRelWidth = 0.05, enemyRelHeight = 0.05;
     const enemyRelSpacing = 0.01;
     const enemyDirection = 1;
-    const enemyRelSpeed = 0.3;
+    const enemyRelSpeed = 0.2;
 
     function generateEnemy(i, j) {
         // Minimum distance from edge is made to be same as space between two enemies

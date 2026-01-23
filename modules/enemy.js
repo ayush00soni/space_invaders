@@ -1,3 +1,5 @@
+import { Bullet } from "./bullet.js";
+
 export class Enemy {
     constructor(id, relX, relY, relSpeed, relWidth, color, spacing, dir, gridPosition) {
         this.id = id;
@@ -52,6 +54,19 @@ export class Enemy {
             width: this.relWidth * gctx.canvas.width,
             height: this.relHeight * gctx.canvas.height
         };
+    }
+
+    shoot(soundManager) {
+        soundManager.playSound("shoot2");
+        const bullet = new Bullet(
+            this.relX, this.relY,
+            0.3,
+            0.005,
+            "red",
+            "assets/img/red_laser.png",
+            -1
+        );
+        return bullet;
     }
 
 }

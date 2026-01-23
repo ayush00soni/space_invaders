@@ -1,5 +1,5 @@
 export class Bullet {
-    constructor(relX, relY, relSpeed, relWidth, color, imageSrc, rotation = 0) {
+    constructor(relX, relY, relSpeed, relWidth, color, imageSrc, dir = 1) {
         this.relX = relX;
         this.relY = relY;
         this.relSpeed = relSpeed;
@@ -9,7 +9,7 @@ export class Bullet {
         this.image.src = imageSrc;
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
-        this.rotation = rotation;
+        this.dir = dir; // 1 for player bullet (up), -1 for enemy bullet (down)
     }
 
     /**
@@ -17,7 +17,7 @@ export class Bullet {
      * @param {CanvasRenderingContext2D} gctx
      */
     update(deltatime) {
-        this.relY -= this.relSpeed * deltatime;
+        this.relY -= this.dir * this.relSpeed * deltatime;
     }
 
     /**
@@ -31,7 +31,11 @@ export class Bullet {
         this.x = gctx.canvas.width * this.relX - this.width / 2;
         this.y = gctx.canvas.height * this.relY - this.height / 2;
         if (this.image.complete) {
-            gctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            gctx.save();
+            gctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+            gctx.rotate(this.dir === 1 ? 0 : Math.PI);
+            gctx.drawImage(this.image, -this.width / 2, -this.height / 2, this.width, this.height);
+            gctx.restore();
         } else {
             gctx.fillStyle = this.color;
             gctx.fillRect(this.x, this.y, this.width, this.height);
@@ -48,6 +52,6 @@ export class Bullet {
     }
 
     isOffScreen() {
-        return this.relY + (this.relHeight / 2) < 0;
+        return this.relY + (this.relHeight / 2) < 0 || this.relY - (this.relHeight / 2) > 1;
     }
 }
