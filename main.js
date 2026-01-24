@@ -31,7 +31,13 @@ const pauseLivesDisplay = document.getElementById("pause-lives-display");
 
 // Background
 const STAR_DENSITY = 5 / (100 * 100); // stars per pixel -> Here 5 stars out of 100x100 pixel area
-const starfield = new StarField(STAR_DENSITY);
+const MIN_STAR_RADIUS = 0.5;
+const MIN_START_OPACITY = 0.5;
+const starfield = new StarField(
+    STAR_DENSITY,
+    MIN_STAR_RADIUS,
+    MIN_START_OPACITY
+);
 
 // Sound Manager
 const soundManager = new SoundManager();
@@ -43,23 +49,7 @@ const gamecanvas = document.getElementById("gamecanvas");
 /** @type {CanvasRenderingContext2D} */
 const gctx = gamecanvas.getContext("2d");
 
-let isGameRunning = false;
-let paused = false;
-
-// Input Handling
-const input = {
-    "ArrowUp": false,
-    "ArrowDown": false,
-    "ArrowLeft": false,
-    "ArrowRight": false,
-    "Space": false,
-    "KeyW": false,
-    "KeyA": false,
-    "KeyS": false,
-    "KeyD": false,
-    "Escape": false
-};
-
+// CONFIGURATIONS
 // Player Configuration
 const PLAYER_START_X = 0.5;
 const PLAYER_START_Y = 0.9;
@@ -90,6 +80,27 @@ const EXPLOSION_PARTICLE_COUNT = 50;
 const EXPLOSION_PARTICLE_SPEED = 50;
 const EXPLOSION_PARTICLE_DECAY = 0.8;
 
+// Game State Variables
+let isGameRunning = false;
+let paused = false;
+let lives = MAX_LIVES; // Player lives
+let score = 0; // Player score
+
+// Input Handling
+const input = {
+    "ArrowUp": false,
+    "ArrowDown": false,
+    "ArrowLeft": false,
+    "ArrowRight": false,
+    "Space": false,
+    "KeyW": false,
+    "KeyA": false,
+    "KeyS": false,
+    "KeyD": false,
+    "Escape": false
+};
+
+
 window.addEventListener("keydown", (e) => {
     if (["ArrowUp", "ArrowDown", "ArrowLeft",
         "ArrowRight", "Space", "KeyW",
@@ -114,9 +125,6 @@ function resizeCanvas() {
     }
 }
 
-// Game State Variables
-let lives = MAX_LIVES; // Player lives
-let score = 0; // Player score
 
 // Main Player
 const player1 = new Player(

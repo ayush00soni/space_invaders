@@ -3,17 +3,25 @@ import { BULLET_DIRECTION } from "./bullet.js";
 import { Particle } from "./particle.js";
 import { PARTICLE_MODE } from "./particle.js";
 
+/**
+ * Represents the player's spaceship.
+ * Handles movement, rendering, shooting, and state management (health/respawn).
+ */
 export class Player {
     /**
-     * @param {number} relX
-     * @param {number} relY
-     * @param {number} relMaxSpeed
-     * @param {number} relAcceleration
-     * @param {number} decFactor
-     * @param {number} relWidth
-     * @param {string} color
-     * @param {number} respawnDelay
-     * @param {number} shootCooldownTime
+     * @param {number} relX - Initial relative X position (0.0 to 1.0)
+     * @param {number} relY - Initial relative Y position (0.0 to 1.0)
+     * @param {number} relMaxSpeed - Maximum speed relative to canvas size
+     * @param {number} relAcceleration - Acceleration rate relative to canvas size
+     * @param {number} decFactor - Deceleration friction factor
+     * @param {number} relWidth - Width relative to canvas width
+     * @param {string} color - Fallback color for the player
+     * @param {number} respawnDelay - Time in seconds before respawning
+     * @param {number} shootCooldownTime - Minimum time between shots
+     * @param {number} invincibilityDuration - Time in seconds to remain invincible after spawn
+     * @param {number} bulletRelSpeed - Bullet speed relative to canvas height
+     * @param {number} bulletRelWidth - Bullet width relative to canvas width
+     * @param {string} bulletColor - Color of the projectile
      */
     constructor(relX, relY, relMaxSpeed, relAcceleration, decFactor, relWidth, color, respawnDelay, shootCooldownTime,
         invincibilityDuration,
@@ -69,10 +77,12 @@ export class Player {
      * @param {CanvasRenderingContext2D} gctx
     */
     draw(gctx) {
-        this.width = gctx.canvas.width * this.relWidth;
+        // Resize player to the image aspect ratio
         this.aspectRatio = this.image.naturalHeight / this.image.naturalWidth;
+        this.width = gctx.canvas.width * this.relWidth;
         this.height = this.width * this.aspectRatio;
         this.relHeight = this.height / gctx.canvas.height;
+
         this.x = gctx.canvas.width * this.relX - this.width / 2;
         this.y = gctx.canvas.height * this.relY - this.height / 2;
         if (this.image.complete) {
@@ -99,8 +109,10 @@ export class Player {
     }
 
     /**
-    * @param {CanvasRenderingContext2D} gctx
-    */
+     * Returns the bounding box of the player for collision detection.
+     * @param {CanvasRenderingContext2D} gctx
+     * @returns {{x: number, y: number, width: number, height: number}}
+     */
     getBounds(gctx) {
         return {
             x: gctx.canvas.width * this.relX - this.relWidth * gctx.canvas.width / 2,
@@ -114,7 +126,7 @@ export class Player {
     * @param {number} deltatime
     */
     move(deltatime) {
-
+        // Update position
         this.relX += this.vx * deltatime;
         this.relY += this.vy * deltatime;
 
@@ -131,21 +143,21 @@ export class Player {
     * @param {object} input
     */
     accelerate(deltatime, input) {
-
+        // Movement Directions
         const dirX = (Number(input["ArrowRight"] || input["KeyD"]) -
             Number(input["ArrowLeft"] || input["KeyA"]));
 
         const dirY = (Number(input["ArrowDown"] || input["KeyS"]) -
             Number(input["ArrowUp"] || input["KeyW"]));
 
-        // X direction
+        // X velocity
         if (!dirX || this.vx * dirX < 0) { // Deceleration
             this.vx = Math.max(0, Math.abs(this.vx) - this.decFactor * this.relAcceleration * deltatime) * Math.sign(this.vx);
         } else {
             this.vx += dirX * this.relAcceleration * deltatime;
         }
 
-        // Y direction
+        // Y velocity
         if (!dirY || this.vy * dirY < 0) { // Deceleration
             this.vy = Math.max(0, Math.abs(this.vy) - this.decFactor * this.relAcceleration * deltatime) * Math.sign(this.vy);
         } else {
@@ -162,6 +174,12 @@ export class Player {
 
     }
 
+    /**
+     * Attempts to fire a bullet.
+     * Checks cooldown and shooting enabled state before firing.
+     * @param {SoundManager} soundManager - Reference to the audio system
+     * @returns {Bullet|null} The created bullet or null if cooldown is active
+     */
     shoot(soundManager) {
         if (this.shootCooldown > 0 || !this.shootingEnabled) return null;
         soundManager.playSound(this.shootSound);
@@ -195,6 +213,17 @@ export class Player {
         }
     }
 
+    /**
+     * Handles the player getting hit by an enemy projectile or collision.
+     * Triggers the explosion effect and disables the player.
+     * @param {SoundManager} soundManager
+     * @param {string} playerHitSound - ID of the sound to play
+     * @param {number} explosionParticleCount - Number of particles to spawn
+     * @param {number} explosionParticleSpeed - Base speed of particles
+     * @param {number} explosionParticleDecay - How fast particles fade
+     * @param {CanvasRenderingContext2D} gctx
+     * @returns {Particle[]} An array of explosion particles to add to the game loop
+     */
     hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx) {
         soundManager.playSound(playerHitSound);
         this.isAlive = false;
@@ -218,6 +247,10 @@ export class Player {
         return particles;
     }
 
+    /**
+     * Resets the player to the initial position and activates invincibility.
+     * Called after the respawn timer expires.
+     */
     respawn() {
         this.relX = this.relXi;
         this.relY = this.relYi;
@@ -228,6 +261,10 @@ export class Player {
         this.invincibilityTimer = this.invincibilityDuration;
     }
 
+    /**
+     * Completely resets the player state for a new game.
+     * Restores lives (handled externally), position, and clears timers.
+     */
     reset() {
         this.relX = this.relXi;
         this.relY = this.relYi;

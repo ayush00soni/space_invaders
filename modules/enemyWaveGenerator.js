@@ -2,9 +2,10 @@ import { Enemy } from "./enemy.js";
 import { ENEMY_DIRECTION } from "./enemy.js";
 
 /**
- * Generates a new wave of enemies based on the wave number.
- * @param {number} wavenumber
- * @returns {[Enemy[], boolean]} Array of Enemy objects and a boolean indicating if max wave is reached
+ * Procedurally generates a wave of enemies using a symmetrical grid pattern.
+ * Increases density and difficulty based on the wave number.
+ * * @param {number} wavenumber - The current wave level (starts at 1)
+ * @returns {[Enemy[], boolean]} The array of Enemy objects and a boolean flag (true if max difficulty reached)
  */
 export function generateEnemyWave(wavenumber) {
     // Grid size limits
@@ -43,6 +44,7 @@ export function generateEnemyWave(wavenumber) {
     const densityFactor = Math.min(INITIAL_DENSITY + (wavenumber - 1) * DENSITY_INCREMENT,
         MAX_DENSITY); // Increase density with wave number
 
+    // Generate enemy for position (i, j) in the grid
     function generateEnemy(i, j) {
         // Minimum distance from edge is made to be same as space between two enemies
         return new Enemy(
