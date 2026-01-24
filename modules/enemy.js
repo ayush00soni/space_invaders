@@ -1,7 +1,16 @@
 import { Bullet } from "./bullet.js";
+import { BULLET_DIRECTION } from "./bullet.js";
+
+export const ENEMY_DIRECTION = {
+    LEFT: -1,
+    RIGHT: 1
+};
 
 export class Enemy {
-    constructor(id, relX, relY, relSpeed, relWidth, color, spacing, dir, gridPosition) {
+    constructor(
+        id, relX, relY, relSpeed, relWidth, color, spacing, dir, gridPosition,
+        bulletRelSpeed, bulletRelWidth, bulletColor
+        ) {
         this.id = id;
         this.relX = relX;
         this.relY = relY;
@@ -15,6 +24,14 @@ export class Enemy {
         this.image.src = "assets/img/enemy.png";
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
+
+        // Bullet properties
+        this.bulletRelSpeed = bulletRelSpeed;
+        this.bulletRelWidth = bulletRelWidth;
+        this.bulletColor = bulletColor;
+        this.bulletImageSrc = "assets/img/red_laser.png";
+
+        this.shootSound = "shoot2";
     }
 
     update(deltatime) {
@@ -29,7 +46,8 @@ export class Enemy {
     isOnEdge(deltatime) {
         // Minimum distance from edge is made to be same as space between two enemies
         const edgeSpace = this.spacing + this.relWidth / 2;
-        return (this.relX + this.dir * this.relSpeed * deltatime < edgeSpace || this.relX + this.dir * this.relSpeed * deltatime > 1 - edgeSpace);
+        return (this.relX + this.dir * this.relSpeed * deltatime < edgeSpace ||
+            this.relX + this.dir * this.relSpeed * deltatime > 1 - edgeSpace);
     }
 
     draw(gctx) {
@@ -57,14 +75,14 @@ export class Enemy {
     }
 
     shoot(soundManager) {
-        soundManager.playSound("shoot2");
+        soundManager.playSound(this.shootSound);
         const bullet = new Bullet(
             this.relX, this.relY,
-            0.3,
-            0.005,
-            "red",
-            "assets/img/red_laser.png",
-            -1
+            this.bulletRelSpeed,
+            this.bulletRelWidth,
+            this.bulletColor,
+            this.bulletImageSrc,
+            BULLET_DIRECTION.DOWN
         );
         return bullet;
     }

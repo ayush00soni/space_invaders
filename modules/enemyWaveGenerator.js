@@ -1,48 +1,63 @@
 import { Enemy } from "./enemy.js";
+import { ENEMY_DIRECTION } from "./enemy.js";
 
 /**
- *
+ * Generates a new wave of enemies based on the wave number.
  * @param {number} wavenumber
- * @param {CanvasRenderingContext2D} gctx
- * @returns {Enemy[], }
-*/
-// TODO: Grid becomes assymetrical for odd number of columns; Fix that
-export function generateEnemyWave(wavenumber, gctx) {
-    const maxGridSize = {
-        rows: 7,
-        columns: 9
+ * @returns {[Enemy[], boolean]} Array of Enemy objects and a boolean indicating if max wave is reached
+ */
+export function generateEnemyWave(wavenumber) {
+    // Grid size limits
+    const MAX_GRID_SIZE = {
+        ROWS: 7,
+        COLUMNS: 9
     };
 
-    const initialGridSize = {
-        rows: 3,
-        columns: 5
+    const INITIAL_GRID_SIZE = {
+        ROWS: 3,
+        COLUMNS: 5
     };
 
+    // Density parameters
+    const INITIAL_DENSITY = 0.5; // Initial density of enemies
+    const DENSITY_INCREMENT = 0.05; // Density increase per wave
+    const MAX_DENSITY = 1.0; // Maximum density
 
+    // Enemy properties
+    const ENEMY_REL_WIDTH = 0.05, ENEMY_REL_HEIGHT = 0.05;
+    const ENEMY_REL_SPACING = 0.01;
+    const ENEMY_REL_SPEED = 0.2;
+
+    // Enemy Bullet Configuration
+    const ENEMY_BULLET_SPEED = 0.5;
+    const ENEMY_BULLET_WIDTH = 0.005;
+    const ENEMY_BULLET_COLOR = "red";
+
+    // Array to hold generated enemies
     const enemyArray = [];
 
-    const enemyColumns = Math.min(initialGridSize.columns + Math.floor((wavenumber - 1) / 2), maxGridSize.columns);
-    const enemyRows = Math.min(initialGridSize.rows + (wavenumber - 1), maxGridSize.rows);
+    // Determine grid size based on wave number
+    const enemyColumns = Math.min(INITIAL_GRID_SIZE.COLUMNS + Math.floor((wavenumber - 1) / 2), MAX_GRID_SIZE.COLUMNS);
+    const enemyRows = Math.min(INITIAL_GRID_SIZE.ROWS + (wavenumber - 1), MAX_GRID_SIZE.ROWS);
 
-    const densityFactor = Math.min(0.5 + (wavenumber - 1) * 0.05, 1); // Increase density with wave number
-
-    const enemyRelWidth = 0.05, enemyRelHeight = 0.05;
-    const enemyRelSpacing = 0.01;
-    const enemyDirection = 1;
-    const enemyRelSpeed = 0.2;
+    const densityFactor = Math.min(INITIAL_DENSITY + (wavenumber - 1) * DENSITY_INCREMENT,
+        MAX_DENSITY); // Increase density with wave number
 
     function generateEnemy(i, j) {
         // Minimum distance from edge is made to be same as space between two enemies
         return new Enemy(
-            (i * maxGridSize.columns) + j,
-            (j + 1) * enemyRelSpacing + (j + 0.5) * enemyRelWidth + 0.001, // Slight offset from left edge
-            i * enemyRelSpacing + (i + 0.5) * enemyRelHeight + 0.1, // RelY
-            enemyRelSpeed, // RelSpeed
-            enemyRelWidth,
+            (i * MAX_GRID_SIZE.COLUMNS) + j,
+            (j + 1) * ENEMY_REL_SPACING + (j + 0.5) * ENEMY_REL_WIDTH + 0.001, // Slight offset from left edge
+            i * ENEMY_REL_SPACING + (i + 0.5) * ENEMY_REL_HEIGHT + 0.1, // RelY
+            ENEMY_REL_SPEED, // RelSpeed
+            ENEMY_REL_WIDTH,
             "gray",
-            enemyRelSpacing,
-            enemyDirection,
-            { row: i, column: j }
+            ENEMY_REL_SPACING,
+            ENEMY_DIRECTION.RIGHT,
+            { row: i, column: j },
+            ENEMY_BULLET_SPEED,
+            ENEMY_BULLET_WIDTH,
+            ENEMY_BULLET_COLOR
         );
     }
     // Using a mirror system to create symmetrical enemy waves
@@ -79,17 +94,17 @@ export function generateEnemyWave(wavenumber, gctx) {
 
     }
 
+    // Generate left half first
     let slotIndex = 0;
-
     for (let i = 0; i < enemyRows; i++) {
         for (let j = 0; j < halfColumns; j++) {
             if (activeSlots[slotIndex++]) {
                 enemyArray.push(generateEnemy(i, j));
             }
         }
-
-        // Right half (mirror image)
     }
+
+    // Generate the right half as mirror image of left half
     slotIndex = 0;
     for (let i = 0; i < enemyRows; i++) {
         for (let j = enemyColumns - 1; j >= halfColumns + (enemyColumns % 2); j--) {
@@ -98,6 +113,7 @@ export function generateEnemyWave(wavenumber, gctx) {
             }
         }
     }
+
     // Randomly fill center column for odd number of columns
     if (enemyColumns % 2 === 1) {
         const centerCol = Math.floor(enemyColumns / 2);
@@ -117,5 +133,5 @@ export function generateEnemyWave(wavenumber, gctx) {
     }
 
 
-    return [enemyArray, ((enemyColumns === maxGridSize.columns) && (enemyRows === maxGridSize.rows) && (densityFactor === 1))];
+    return [enemyArray, ((enemyColumns === MAX_GRID_SIZE.COLUMNS) && (enemyRows === MAX_GRID_SIZE.ROWS) && (densityFactor === 1))];
 }

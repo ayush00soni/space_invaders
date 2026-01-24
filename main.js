@@ -4,6 +4,7 @@ import { generateEnemyWave } from "./modules/enemyWaveGenerator.js";
 import { StarField } from "./modules/background.js";
 import { Particle } from "./modules/particle.js";
 import { SoundManager } from "./modules/soundManager.js";
+import { PARTICLE_MODE } from "./modules/particle.js";
 
 // UI Setup
 const hud = document.getElementById("hud");
@@ -23,12 +24,14 @@ const finalScoreDisplay = document.getElementById("final-score-display");
 const restartButton = document.getElementById("restart-button");
 
 // Pause Screen Setup
+const pauseScreen = document.getElementById("pause-screen");
 const resumeButton = document.getElementById("resume-button");
 const pauseScoreDisplay = document.getElementById("pause-score-display");
 const pauseLivesDisplay = document.getElementById("pause-lives-display");
 
 // Background
-const starfield = new StarField(5); // 5 stars per 100x100 pixels
+const STAR_DENSITY = 5 / (100 * 100); // stars per pixel -> Here 5 stars out of 100x100 pixel area
+const starfield = new StarField(STAR_DENSITY);
 
 // Sound Manager
 const soundManager = new SoundManager();
@@ -57,6 +60,36 @@ const input = {
     "Escape": false
 };
 
+// Player Configuration
+const PLAYER_START_X = 0.5;
+const PLAYER_START_Y = 0.9;
+const PLAYER_HIT_SOUND = "explosion";
+const PLAYER_MAX_SPEED = 0.7; // Relative to canvas size
+const PLAYER_ACCELERATION = 0.6; // Relative to canvas size
+const PLAYER_DEC_FACTOR = 6; // Deceleration factor
+const PLAYER_REL_WIDTH = 0.05;
+const PLAYER_COLOR = "green";
+const PLAYER_RESPAWN_DELAY = (soundManager.getDuration(PLAYER_HIT_SOUND) + 2); // Seconds
+const PLAYER_SHOOT_COOLDOWN = 0.4; // Seconds between shots
+const PLAYER_INVINCIBILITY_DURATION = 3; // Seconds of invincibility after respawn
+const MAX_LIVES = 3; // Maximum player lives
+
+// Player Bullet Configuration
+const PLAYER_BULLET_SPEED = 0.8;
+const PLAYER_BULLET_WIDTH = 0.005;
+const PLAYER_BULLET_COLOR = "green";
+
+// Enemy Wave Configuration
+const ENEMY_SHOOT_INTERVAL = 2; // Seconds between enemy shots
+const ENEMY_DEADLINE_OFFSET = 0.05; // Distance from player to enemy deadline
+const ENEMY_WAVE_DELAY = 2; // Seconds between waves
+const ENEMY_HIT_SOUND = "explosion";
+
+// Particle Effect Configuration for explosions
+const EXPLOSION_PARTICLE_COUNT = 50;
+const EXPLOSION_PARTICLE_SPEED = 50;
+const EXPLOSION_PARTICLE_DECAY = 0.8;
+
 window.addEventListener("keydown", (e) => {
     if (["ArrowUp", "ArrowDown", "ArrowLeft",
         "ArrowRight", "Space", "KeyW",
@@ -80,19 +113,27 @@ function resizeCanvas() {
         renderInitialScreen();
     }
 }
-const maxLives = 3; // Maximum player lives
-let lives = maxLives; // Player lives
+
+// Game State Variables
+let lives = MAX_LIVES; // Player lives
 let score = 0; // Player score
 
 // Main Player
-const playerRelX = 0.5;
-const playerRelY = 0.9;
-const playerHitSound = "explosion";
 const player1 = new Player(
-    playerRelX, playerRelY,
-    0.7, 0.6,
-    0.05,
-    "green", (soundManager.getDuration(playerHitSound) + 2));
+    PLAYER_START_X,
+    PLAYER_START_Y,
+    PLAYER_MAX_SPEED,
+    PLAYER_ACCELERATION,
+    PLAYER_DEC_FACTOR,
+    PLAYER_REL_WIDTH,
+    PLAYER_COLOR,
+    PLAYER_RESPAWN_DELAY,
+    PLAYER_SHOOT_COOLDOWN,
+    PLAYER_INVINCIBILITY_DURATION,
+    PLAYER_BULLET_SPEED,
+    PLAYER_BULLET_WIDTH,
+    PLAYER_BULLET_COLOR
+);
 
 player1.image.onload = () => {
     renderInitialScreen();
@@ -108,7 +149,13 @@ function renderInitialScreen() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
+// Delta time cap to avoid big jumps
+const DELTA_TIME_CAP = 0.1;
 
+// Delay for Game Over Screen
+const GAME_OVER_DELAY = 1000;
+
+// Main Game Function
 function game() {
     isGameRunning = true;
     soundManager.playSound("startGame");
@@ -124,21 +171,16 @@ function game() {
 
     // Enemy Bullet Array
     const enemyBullets = [];
-    const enemyShootInterval = 2; // Seconds between enemy shots
     let enemyShootTimer = 0;
 
     // Enemies Array
     const enemies = [];
-    const enemyDeadLineY = playerRelY - player1.relHeight / 2 - 0.05; // Deadline above player
+    const enemyDeadLineY = PLAYER_START_Y - player1.relHeight / 2 - ENEMY_DEADLINE_OFFSET; // Deadline above player
     let wavenumber = 0;
-    const enemyWaveDelay = 2; // Seconds between waves
     let enemyWaveTimer = 0;
 
     // Particle effects array
     const particles = [];
-    const explosionParticleCount = 50;
-    const explosionParticleSpeed = 50;
-    const explosionParticleDecay = 0.8;
 
     let lasttime = 0; // For delta time calculation
     // Game Loop
@@ -153,7 +195,7 @@ function game() {
             return;
         }
 
-        const deltatime = Math.min((timestamp - lasttime) / 1000, 0.1); // Cap delta time to avoid big jumps
+        const deltatime = Math.min((timestamp - lasttime) / 1000, DELTA_TIME_CAP); // Cap delta time to avoid big jumps
         lasttime = timestamp;
         update(deltatime);
         draw();
@@ -195,7 +237,7 @@ function game() {
 
             if (isMaxWave) {
                 playerWon = true;
-            } else if (enemyWaveTimer >= enemyWaveDelay || wavenumber === 0) {
+            } else if (enemyWaveTimer >= ENEMY_WAVE_DELAY || wavenumber === 0) {
                 // Delete all existing bullets
                 playerBullets.length = 0;
 
@@ -203,7 +245,7 @@ function game() {
                 wavenumber++;
 
                 if (wavenumber > 1) soundManager.playSound("newWave");
-                [newEnemies, isMaxWave] = generateEnemyWave(wavenumber, gctx);
+                [newEnemies, isMaxWave] = generateEnemyWave(wavenumber);
                 enemies.push(...newEnemies);
                 // Re-enable shooting after new wave spawns
                 player1.shootingEnabled = true;
@@ -225,7 +267,13 @@ function game() {
                 if (!enemy.active) continue;
                 if (collisionDetected(player1, enemy, gctx) && player1.invincibilityTimer <= 0) {
                     lives--;
-                    const newParticles = player1.hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx);
+                    const newParticles = player1.hit(
+                        soundManager,
+                        PLAYER_HIT_SOUND,
+                        EXPLOSION_PARTICLE_COUNT,
+                        EXPLOSION_PARTICLE_SPEED,
+                        EXPLOSION_PARTICLE_DECAY,
+                        gctx);
                     particles.push(...newParticles);
                     break;
                 }
@@ -234,7 +282,7 @@ function game() {
             // Handle Player Respawn logic
             if (player1.respawnTimer > 0) {
 
-                if (player1.respawnTimer < player1.respawnDelay - soundManager.getDuration(playerHitSound)) { // Start implosion when hit sound ends
+                if (player1.respawnTimer < player1.respawnDelay - soundManager.getDuration(PLAYER_HIT_SOUND)) { // Start implosion when hit sound ends
                     // Generate implosion particles during respawn delay
                     const implosionRadius = Math.max(player1.relWidth, player1.relHeight);
                     const particleDecay = 1 / player1.respawnTimer;
@@ -244,7 +292,9 @@ function game() {
                         player1.relYi,
                         player1.color,
                         particleDecay,
-                        particleSpeed, 0, gctx
+                        particleSpeed,
+                        PARTICLE_MODE.IMPLOSION,
+                        gctx
                     ));
                 }
                 player1.respawnTimer -= deltatime;
@@ -285,7 +335,7 @@ function game() {
         }
 
         // Enemy Shooting
-        if (enemyShootTimer >= enemyShootInterval && !(gameOver || playerWon)) {
+        if (enemyShootTimer >= ENEMY_SHOOT_INTERVAL && !(gameOver || playerWon)) {
             enemyShootTimer = 0;
             // Select a random active enemy to shoot
             const activeEnemies = enemies.filter(enemy => enemy.active);
@@ -303,15 +353,17 @@ function game() {
                     bullet.active = false;
                     enemy.active = false;
                     score += 10;
-                    soundManager.playSound("explosion");
+                    soundManager.playSound(ENEMY_HIT_SOUND);
                     // Create particle effect
-                    for (let i = 0; i < explosionParticleCount; i++) {
+                    for (let i = 0; i < EXPLOSION_PARTICLE_COUNT; i++) {
                         const particle = new Particle(
                             enemy.relX,
                             enemy.relY,
                             enemy.color,
-                            explosionParticleDecay,
-                            explosionParticleSpeed * (1 + Math.random()), 1, gctx
+                            EXPLOSION_PARTICLE_DECAY,
+                            EXPLOSION_PARTICLE_SPEED * (1 + Math.random()),
+                            PARTICLE_MODE.EXPLOSION,
+                            gctx
                         );
                         particles.push(particle);
                     }
@@ -326,8 +378,8 @@ function game() {
                 if (bullet.active && collisionDetected(bullet, player1, gctx) && player1.invincibilityTimer <= 0) {
                     bullet.active = false;
                     lives--;
-                    soundManager.playSound(playerHitSound);
-                    const newParticles = player1.hit(soundManager, playerHitSound, explosionParticleCount, explosionParticleSpeed, explosionParticleDecay, gctx);
+                    soundManager.playSound(PLAYER_HIT_SOUND);
+                    const newParticles = player1.hit(soundManager, PLAYER_HIT_SOUND, EXPLOSION_PARTICLE_COUNT, EXPLOSION_PARTICLE_SPEED, EXPLOSION_PARTICLE_DECAY, gctx);
                     particles.push(...newParticles);
                 }
             }
@@ -424,14 +476,13 @@ function game() {
             player1.shootingEnabled = false;
 
             finalSoundPlayed = true;
-            const soundDelay = (lives === 0) ? soundManager.getDuration(playerHitSound) : 0;
-            if (soundDelay > 0) {
-            }
+            const soundDelay = (lives === 0) ? soundManager.getDuration(PLAYER_HIT_SOUND) : 0;
+
             setTimeout(() => {
                 if (gameOver) {
                     soundManager.playSound("gameOver");
                 } else if (playerWon) {
-                    soundManager.playSound("playerWin");
+                    soundManager.playSound("playerWon");
                 }
             }, soundDelay * 1000);
             // Delay showing game over screen to allow last frame to render
@@ -447,7 +498,7 @@ function game() {
                     gameOverTitle.classList.add("hidden");
                     winTitle.classList.remove("hidden");
                 }
-            }, 1000 + (soundDelay * 1000));
+            }, GAME_OVER_DELAY + (soundDelay * 1000));
 
         }
     }
@@ -481,17 +532,21 @@ restartButton.addEventListener("click", () => {
 });
 
 pauseButton.addEventListener("click", () => {
-    soundManager.playSound("pause");
-    paused = true;
-    pauseScoreDisplay.textContent = `Score: ${score}`;
-    pauseLivesDisplay.textContent = `Lives: ${lives}`;
-    document.getElementById("pause-screen").classList.remove("hidden");
-    hud.classList.add("hidden");
+    if (!paused) {
+        soundManager.playSound("pause");
+        paused = true;
+        pauseScoreDisplay.textContent = `Score: ${score}`;
+        pauseLivesDisplay.textContent = `Lives: ${lives}`;
+        pauseScreen.classList.remove("hidden");
+        hud.classList.add("hidden");
+    }
 });
 
 resumeButton.addEventListener("click", () => {
-    soundManager.playSound("pause");
-    paused = false;
-    document.getElementById("pause-screen").classList.add("hidden");
-    hud.classList.remove("hidden");
+    if (paused) {
+        soundManager.playSound("pause");
+        paused = false;
+        pauseScreen.classList.add("hidden");
+        hud.classList.remove("hidden");
+    }
 });

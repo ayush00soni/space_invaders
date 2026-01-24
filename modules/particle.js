@@ -1,12 +1,10 @@
+export const PARTICLE_MODE = {
+    EXPLOSION: 1,
+    IMPLOSION: 0
+};
+
 export class Particle {
     constructor(relX, relY, color, decay, speed, mode, gctx) {
-        this.color = color;
-        this.decay = decay;
-        this.life = 1.0;
-        this.speed = speed;
-        this.maxSize = 3;
-        this.size = this.maxSize * Math.random();
-        this.angle = Math.random() * 2 * Math.PI;
         if (mode) {
             this.relX = relX;
             this.relY = relY;
@@ -15,10 +13,17 @@ export class Particle {
             this.relX = relX + this.radius * Math.cos(this.angle);
             this.relY = relY + this.radius * Math.sin(this.angle);
         }
+        this.color = color;
+        this.decay = decay;
+        this.speed = speed;
         this.mode = mode; // 1: particle for explosion, 0:particle for implosion
-        this.dir = (this.mode) ? 1 : -1;
+        this.size = this.maxSize * Math.random();
+        this.angle = Math.random() * 2 * Math.PI;
+        this.dir = (this.mode) ? 1 : -1; // 1 for explosion and -1 for implosion
         this.vx = this.dir * Math.cos(this.angle) * this.speed;
         this.vy = this.dir * Math.sin(this.angle) * this.speed;
+        this.life = 1.0;
+        this.maxSize = 3;
     }
 
     update(deltatime, gctx) {

@@ -1,9 +1,12 @@
 export class StarField {
     constructor(density) {
         this.stars = [];
-        this.density = density; // Number of stars per 100x100 pixels
+        this.density = density; // star per pixel
         this.lastwidth = 0;
         this.lastheight = 0;
+
+        this.minRadius = 0.5;
+        this.minOpacity = 0.5;
     }
 
     resize(width, height) {
@@ -26,14 +29,14 @@ export class StarField {
 
     spawnStars(offsetX, offsetY, width, height) {
         const area = width * height;
-        const totalStars = Math.floor(this.density * (area / (100 * 100)));
+        const totalStars = Math.floor(this.density * area);
 
         for (let i = 0; i < totalStars; i++) {
             this.stars.push({
                 x: offsetX + Math.random() * width,
                 y: offsetY + Math.random() * height,
-                radius: Math.random() + 0.5,
-                opacity: Math.random() * 0.5 + 0.5
+                radius: Math.random() + this.minRadius,
+                opacity: (Math.random() + 1) * this.minOpacity
             });
         }
     }

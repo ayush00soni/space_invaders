@@ -1,3 +1,8 @@
+export const BULLET_DIRECTION = {
+    UP: 1,
+    DOWN: -1
+};
+
 export class Bullet {
     constructor(relX, relY, relSpeed, relWidth, color, imageSrc, dir = 1) {
         this.relX = relX;

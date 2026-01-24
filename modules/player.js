@@ -1,5 +1,7 @@
 import { Bullet } from "./bullet.js";
+import { BULLET_DIRECTION } from "./bullet.js";
 import { Particle } from "./particle.js";
+import { PARTICLE_MODE } from "./particle.js";
 
 export class Player {
     /**
@@ -7,33 +9,61 @@ export class Player {
      * @param {number} relY
      * @param {number} relMaxSpeed
      * @param {number} relAcceleration
-     * @param {number} width
-     * @param {number} height
+     * @param {number} decFactor
+     * @param {number} relWidth
      * @param {string} color
+     * @param {number} respawnDelay
+     * @param {number} shootCooldownTime
      */
-    constructor(relX, relY, relMaxSpeed, relAcceleration, relWidth, color, respawnDelay) {
+    constructor(relX, relY, relMaxSpeed, relAcceleration, decFactor, relWidth, color, respawnDelay, shootCooldownTime,
+        invincibilityDuration,
+        bulletRelSpeed, bulletRelWidth, bulletColor
+    ) {
+        // Position
         this.relX = relX;
         this.relY = relY;
         this.relXi = relX; // Initial positions for respawn
         this.relYi = relY; // Initial positions for respawn
-        this.relMaxSpeed = relMaxSpeed;
-        this.relAcceleration = relAcceleration;
-        this.vx = 0;
-        this.vy = 0;
+
         this.color = color;
-        this.shootCooldown = 0;
-        this.isAlive = true;
-        this.respawnDelay = respawnDelay;
-        this.respawnTimer = 0;
-        this.decFactor = 6; // Deceleration factor
-        this.shootingEnabled = true;
-        this.image = new Image();
-        this.image.src = "assets/img/player.png";
+
+        // Dimensions
         this.relWidth = relWidth;
         this.relHeight = this.relWidth;
 
-        this.invincibilityDuration = 3; // seconds
+        // Movement properties
+        this.vx = 0;
+        this.vy = 0;
+        this.relMaxSpeed = relMaxSpeed;
+        this.relAcceleration = relAcceleration;
+        this.decFactor = decFactor;
+
+        // Shooting properties
+        this.shootCooldown = 0;
+        this.shootingEnabled = true;
+        this.shootCooldownTime = shootCooldownTime;
+        this.shootSound = "shoot";
+
+        // Respawn properties
+        this.respawnTimer = 0;
+        this.respawnDelay = respawnDelay;
+
+        // Load player image
+        this.image = new Image();
+        this.image.src = "assets/img/player.png";
+
+        // Invincibility properties
+        this.invincibilityDuration = invincibilityDuration; // seconds
         this.invincibilityTimer = 0;
+
+        // Bullet properties
+        this.bulletRelSpeed = bulletRelSpeed;
+        this.bulletRelWidth = bulletRelWidth;
+        this.bulletColor = bulletColor;
+        this.bulletImageSrc = "assets/img/green_laser.png";
+
+        // Player state
+        this.isAlive = true;
     }
     /**
      * @param {CanvasRenderingContext2D} gctx
@@ -57,7 +87,8 @@ export class Player {
             gctx.save();
             gctx.beginPath();
             gctx.arc(this.x + this.width / 2, this.y + this.height / 2, Math.max(this.width, this.height), 0, 2 * Math.PI);
-            gctx.strokeStyle = `rgba(0, 255, 0, ${(this.invincibilityTimer / this.invincibilityDuration)})`;
+            const alpha = this.invincibilityTimer / this.invincibilityDuration;
+            gctx.strokeStyle = `rgba(0, 255, 0, ${alpha})`;
             gctx.lineWidth = 3;
             gctx.shadowBlur = 20;
             gctx.shadowColor = 'green';
@@ -67,6 +98,9 @@ export class Player {
 
     }
 
+    /**
+    * @param {CanvasRenderingContext2D} gctx
+    */
     getBounds(gctx) {
         return {
             x: gctx.canvas.width * this.relX - this.relWidth * gctx.canvas.width / 2,
@@ -78,7 +112,6 @@ export class Player {
 
     /**
     * @param {number} deltatime
-    * @param {CanvasRenderingContext2D} gctx
     */
     move(deltatime) {
 
@@ -93,6 +126,10 @@ export class Player {
 
     }
 
+    /**
+    * @param {number} deltatime
+    * @param {object} input
+    */
     accelerate(deltatime, input) {
 
         const dirX = (Number(input["ArrowRight"] || input["KeyD"]) -
@@ -127,14 +164,15 @@ export class Player {
 
     shoot(soundManager) {
         if (this.shootCooldown > 0 || !this.shootingEnabled) return null;
-        soundManager.playSound("shoot");
-        this.shootCooldown = 0.4;
+        soundManager.playSound(this.shootSound);
+        this.shootCooldown = this.shootCooldownTime;
         const bullet = new Bullet(
             this.relX, this.relY,
-            0.8,
-            0.005,
-            "green",
-            "assets/img/green_laser.png"
+            this.bulletRelSpeed,
+            this.bulletRelWidth,
+            this.bulletColor,
+            this.bulletImageSrc,
+            BULLET_DIRECTION.UP
         );
         return bullet;
     }
@@ -171,7 +209,9 @@ export class Player {
                 this.relY,
                 this.color,
                 explosionParticleDecay,
-                explosionParticleSpeed * (1 + Math.random()), 1, gctx
+                explosionParticleSpeed * (1 + Math.random()),
+                PARTICLE_MODE.EXPLOSION,
+                gctx
             );
             particles.push(particle);
         }
