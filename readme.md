@@ -3,7 +3,7 @@
 A modern, object-oriented implementation of the arcade classic using vanilla JavaScript and HTML5 Canvas. This project demonstrates a custom 2D rendering engine, state management, and procedural content generation without external game libraries.
 
 ## 🎮 Play the Game
-**Link Will Be Availble when published**
+**[Space Invaders](https://ayush00soni.github.io/space_invaders/)**
 
 ## ✨ Features
 * **Custom Game Engine:** Built from scratch using `requestAnimationFrame` with Delta Time for frame-rate independent movement.
