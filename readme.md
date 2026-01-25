@@ -44,4 +44,4 @@ A modern, object-oriented implementation of the arcade classic using vanilla Jav
 * **Development:** Ayush Soni
 * **Assets:** Graphics and Audio provided by [Kenney.nl](https://kenney.nl) (License: CC0 1.0 Universal)
 * **Fonts:** "VT323" from [Google Fonts](https://fonts.google.com/specimen/VT323)
-* **Tools:** Favicons generated using [RealFaviconGenerator.net](https://realfavicongenerator.net)
+* **Tools:** Favicons generated using [RealFaviconGenerator.net](https://realfavicongenerator.net) & [Image Generator / PWABuilder](https://www.pwabuilder.com/imageGenerator)
