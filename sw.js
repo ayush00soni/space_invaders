@@ -1,4 +1,4 @@
-const CACHE_NAME = "invader-v1";
+const CACHE_NAME = "invader-v1.1";
 const cacheFiles = [
     // Root
     './',
@@ -34,12 +34,14 @@ const cacheFiles = [
     './assets/audio/new_wave.ogg',
     './assets/audio/pause.ogg',
 
-    // Favicons
-    './assets/favicon/web-app-manifest-192x192.png',
-    './assets/favicon/web-app-manifest-512x512.png',
+    // Favicons (Standard)
     './assets/favicon/favicon.ico',
     './assets/favicon/favicon.svg',
-    './assets/favicon/apple-touch-icon.png'
+    './assets/favicon/apple-touch-icon.png',
+
+    // Favicons (Android PWA)
+    './assets/favicon/android/android-launchericon-192-192.png',
+    './assets/favicon/android/android-launchericon-512-512.png'
 ];
 
 self.addEventListener('install', (event) => {
